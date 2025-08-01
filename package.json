@@ -1,0 +1,49 @@
+{
+  "name": "basis-theory-ai-sandbox",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Sandbox for demonstrating the Basis Theory AI platform",
+  "keywords": [
+    "basis-theory",
+    "ai",
+    "sandbox",
+    "agent",
+    "agentic-commerce",
+    "agentic-payments",
+    "agent-pay",
+    "intelligent-commerce",
+    "intelligent-payments",
+    "react",
+    "nextjs",
+    "payments",
+    "jwt",
+    "authentication"
+  ],
+  "author": "Basis Theory AI",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Basis-Theory-AI/sandbox"
+  },
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@basis-theory-ai/react": "*",
+    "jose": "^5.0.0",
+    "next": "^13.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.0.0"
+  }
+}
