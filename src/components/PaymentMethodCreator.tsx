@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 interface PaymentMethodCreatorProps {
   onPaymentMethodCreated?: (paymentMethod: any) => void
   onError?: (error: string) => void
+  jwt?: string
 }
 
 interface CardFormData {
@@ -37,7 +38,7 @@ const TEST_CARDS = {
   }
 }
 
-export function PaymentMethodCreator({ onPaymentMethodCreated, onError }: PaymentMethodCreatorProps) {
+export function PaymentMethodCreator({ onPaymentMethodCreated, onError, jwt }: PaymentMethodCreatorProps) {
   const [formData, setFormData] = useState<CardFormData>({
     cardNumber: '',
     expirationMonth: '',
@@ -84,11 +85,18 @@ export function PaymentMethodCreator({ onPaymentMethodCreated, onError }: Paymen
     setLoading(true)
 
     try {
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json'
+      }
+      
+      // Add JWT if provided (should have public role for payment method creation)
+      if (jwt) {
+        headers['Authorization'] = `Bearer ${jwt}`
+      }
+      
       const response = await fetch('/api/payment-methods', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers,
         body: JSON.stringify({
           cardNumber: formData.cardNumber.replace(/\s/g, ''),
           expirationMonth: formData.expirationMonth,

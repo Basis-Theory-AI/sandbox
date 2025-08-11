@@ -19,10 +19,18 @@ export async function GET(
       )
     }
 
-    // Generate JWT for API authentication
-    const config = getJWTConfig()
-    const defaultUserId = 'user123'
-    const jwt = await generateJWT(defaultUserId, config, ['private'])
+    // Get JWT from Authorization header or generate default with private role
+    const authHeader = request.headers.get('Authorization')
+    let jwt: string
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      jwt = authHeader.substring(7)
+    } else {
+      // Fallback: generate JWT with private role for fetching purchase intent details
+      const config = getJWTConfig()
+      const defaultUserId = process.env.NEXT_PUBLIC_DEFAULT_USER_ID || 'user123'
+      jwt = await generateJWT(defaultUserId, config, ['private'])
+    }
 
     console.log('🔍 Fetching purchase intent details for:', id)
 

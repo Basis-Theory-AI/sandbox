@@ -37,7 +37,7 @@ function copyToClipboard(text: string) {
 }
 
 // Enhanced Authentication Tab Component
-function AuthenticationTab({ defaultJWT }: { defaultJWT: string }) {
+function AuthenticationTab({ defaultJWT, onJWTUpdate }: { defaultJWT: string, onJWTUpdate?: (publicJWT: string, privateJWT: string) => void }) {
   const [frontendJWT, setFrontendJWT] = useState(defaultJWT)
   const [backendJWT, setBackendJWT] = useState('')
   const [entityId, setEntityId] = useState('user123')
@@ -61,6 +61,10 @@ function AuthenticationTab({ defaultJWT }: { defaultJWT: string }) {
         
         if (response.ok) {
           setBackendJWT(data.jwt)
+          // Notify parent when backend JWT is loaded
+          if (onJWTUpdate && frontendJWT) {
+            onJWTUpdate(frontendJWT, data.jwt)
+          }
         } else {
           console.error('Failed to fetch backend JWT:', data.error)
         }
@@ -97,8 +101,16 @@ function AuthenticationTab({ defaultJWT }: { defaultJWT: string }) {
 
       if (isBackend) {
         setBackendJWT(data.jwt)
+        // Notify parent of JWT updates (backend JWT has private role)
+        if (onJWTUpdate && frontendJWT) {
+          onJWTUpdate(frontendJWT, data.jwt)
+        }
       } else {
         setFrontendJWT(data.jwt)
+        // Notify parent of JWT updates (frontend JWT has public role)
+        if (onJWTUpdate && backendJWT) {
+          onJWTUpdate(data.jwt, backendJWT)
+        }
       }
 
     } catch (error) {
@@ -232,11 +244,12 @@ function AuthenticationTab({ defaultJWT }: { defaultJWT: string }) {
 }
 
 // Payment Method Modal Component
-function PaymentMethodModal({ isOpen, onClose, onPaymentMethodCreated, onError }: {
+function PaymentMethodModal({ isOpen, onClose, onPaymentMethodCreated, onError, jwt }: {
   isOpen: boolean
   onClose: () => void
   onPaymentMethodCreated?: (paymentMethod: any) => void
   onError?: (error: string) => void
+  jwt?: string
 }) {
   if (!isOpen) return null
 
@@ -261,6 +274,7 @@ function PaymentMethodModal({ isOpen, onClose, onPaymentMethodCreated, onError }
             onClose()
           }}
           onError={onError}
+          jwt={jwt}
         />
       </div>
     </div>
@@ -279,12 +293,81 @@ function AppContent({ jwt }: { jwt: string }) {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'authentication' | 'payment-methods' | 'purchase-intents'>('authentication')
   const [paymentModalOpen, setPaymentModalOpen] = useState(false)
+  
+  // Manage JWTs with different roles
+  const [publicJWT, setPublicJWT] = useState(jwt) // For payment method creation (default has public role)
+  const [privateJWT, setPrivateJWT] = useState<string | null>(null) // For everything else
+  
+  const handleJWTUpdate = (publicToken: string, privateToken: string) => {
+    setPublicJWT(publicToken)
+    setPrivateJWT(privateToken)
+  }
+  
+  // Initialize private JWT on mount and then fetch data
+  useEffect(() => {
+    const initializeAndFetch = async () => {
+      try {
+        // First, get the private JWT
+        const response = await fetch('/api/auth/backend-jwt')
+        const data = await response.json()
+        if (response.ok) {
+          setPrivateJWT(data.jwt)
+          
+          // Now fetch data with the private JWT
+          // Fetch payment methods with private JWT
+          setLoadingPaymentMethods(true)
+          try {
+            const pmResponse = await fetch('/api/payment-methods', {
+              headers: {
+                'Authorization': `Bearer ${data.jwt}`
+              }
+            })
+            const pmData = await pmResponse.json()
+            if (pmResponse.ok) {
+              setPaymentMethods(pmData)
+            }
+          } catch (err) {
+            console.error('Error fetching payment methods:', err)
+          } finally {
+            setLoadingPaymentMethods(false)
+          }
+          
+          // Fetch purchase intents with private JWT
+          setLoadingPurchaseIntents(true)
+          try {
+            const piResponse = await fetch('/api/purchase-intents', {
+              headers: {
+                'Authorization': `Bearer ${data.jwt}`
+              }
+            })
+            const piData = await piResponse.json()
+            if (piResponse.ok) {
+              setPurchaseIntents(piData)
+            }
+          } catch (err) {
+            console.error('Error fetching purchase intents:', err)
+          } finally {
+            setLoadingPurchaseIntents(false)
+          }
+        }
+      } catch (error) {
+        console.error('Failed to initialize:', error)
+      }
+    }
+    initializeAndFetch()
+  }, [])
 
-  // Fetch payment methods
+  // Fetch payment methods (requires private role)
   const fetchPaymentMethods = async () => {
     setLoadingPaymentMethods(true)
     try {
-      const response = await fetch('/api/payment-methods')
+      // Use private JWT for fetching payment methods
+      const jwtToUse = privateJWT || jwt
+      const response = await fetch('/api/payment-methods', {
+        headers: {
+          'Authorization': `Bearer ${jwtToUse}`
+        }
+      })
       const data = await response.json()
       
       if (!response.ok) {
@@ -299,11 +382,17 @@ function AppContent({ jwt }: { jwt: string }) {
     }
   }
 
-  // Fetch purchase intents
+  // Fetch purchase intents (requires private role)
   const fetchPurchaseIntents = async () => {
     setLoadingPurchaseIntents(true)
     try {
-      const response = await fetch('/api/purchase-intents')
+      // Use private JWT for fetching purchase intents
+      const jwtToUse = privateJWT || jwt
+      const response = await fetch('/api/purchase-intents', {
+        headers: {
+          'Authorization': `Bearer ${jwtToUse}`
+        }
+      })
       const data = await response.json()
       
       if (!response.ok) {
@@ -318,11 +407,7 @@ function AppContent({ jwt }: { jwt: string }) {
     }
   }
 
-  // Load data on mount
-  useEffect(() => {
-    fetchPaymentMethods()
-    fetchPurchaseIntents()
-  }, [])
+  // Data is loaded in the initialization useEffect above
 
   // Handle success messages
   const handlePaymentMethodCreated = (newPaymentMethod: any) => {
@@ -442,7 +527,7 @@ function AppContent({ jwt }: { jwt: string }) {
 
         {/* Tab Content */}
         {activeTab === 'authentication' && (
-          <AuthenticationTab defaultJWT={jwt} />
+          <AuthenticationTab defaultJWT={jwt} onJWTUpdate={handleJWTUpdate} />
         )}
 
         {activeTab === 'payment-methods' && (
@@ -470,6 +555,7 @@ function AppContent({ jwt }: { jwt: string }) {
               loading={loadingPaymentMethods}
               onPurchaseIntentCreated={handlePurchaseIntentCreated}
               onError={handleError}
+              jwt={privateJWT || jwt}
             />
           </div>
         )}
@@ -493,7 +579,7 @@ function AppContent({ jwt }: { jwt: string }) {
               onVerificationStarted={handleVerificationStarted}
               onVerificationCompleted={handleVerificationCompleted}
               onError={handleError}
-              jwt={jwt}
+              jwt={privateJWT || jwt}
               visaSession={visaStatus.session}
               visaReady={visaStatus.isReady}
             />
@@ -507,6 +593,7 @@ function AppContent({ jwt }: { jwt: string }) {
         onClose={() => setPaymentModalOpen(false)}
         onPaymentMethodCreated={handlePaymentMethodCreated}
         onError={handleError}
+        jwt={publicJWT}
       />
     </div>
   )

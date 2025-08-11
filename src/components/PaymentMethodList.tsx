@@ -30,6 +30,7 @@ interface PaymentMethodListProps {
   loading?: boolean
   onPurchaseIntentCreated?: (purchaseIntent: any) => void
   onError?: (error: string) => void
+  jwt?: string
 }
 
 // Brand badge component with proper SVG icons
@@ -114,7 +115,8 @@ export function PaymentMethodList({
   onRefresh,
   loading,
   onPurchaseIntentCreated,
-  onError
+  onError,
+  jwt
 }: PaymentMethodListProps) {
   const [creatingIntentFor, setCreatingIntentFor] = React.useState<string | null>(null)
 
@@ -122,11 +124,18 @@ export function PaymentMethodList({
     setCreatingIntentFor(paymentMethod.id)
     
     try {
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json'
+      }
+      
+      // Add JWT if provided (should have private role for purchase intent creation)
+      if (jwt) {
+        headers['Authorization'] = `Bearer ${jwt}`
+      }
+      
       const response = await fetch('/api/purchase-intents', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers,
         body: JSON.stringify({
           paymentMethodId: paymentMethod.id,
           credentialType: 'VISA_SRC',

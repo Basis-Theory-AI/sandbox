@@ -4,7 +4,7 @@ import { generateJWT, getJWTConfig } from '../../../lib/jwt/jwtService'
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000'
 const PROJECT_ID = process.env.JWT_PROJECT_ID
 
-// POST - Create Payment Method
+// POST - Create Payment Method (requires public role)
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -18,10 +18,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate JWT for API authentication
-    const config = getJWTConfig()
-    const defaultUserId = 'user123'
-    const jwt = await generateJWT(defaultUserId, config, ['private'])
+    // Get JWT from Authorization header or generate default with public role
+    const authHeader = request.headers.get('Authorization')
+    let jwt: string
+    const defaultUserId = process.env.NEXT_PUBLIC_DEFAULT_USER_ID || 'user123'
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      jwt = authHeader.substring(7)
+    } else {
+      // Fallback: generate JWT with public role for payment method creation
+      const config = getJWTConfig()
+      jwt = await generateJWT(defaultUserId, config, ['public'])
+    }
 
     // Prepare payment method data
     const paymentMethodData = {
@@ -78,13 +86,21 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET - List Payment Methods
-export async function GET() {
+// GET - List Payment Methods (requires private role)
+export async function GET(request: NextRequest) {
   try {
-    // Generate JWT for API authentication
-    const config = getJWTConfig()
-    const defaultUserId = 'user123'
-    const jwt = await generateJWT(defaultUserId, config, ['private'])
+    // Get JWT from Authorization header or generate default with private role
+    const authHeader = request.headers.get('Authorization')
+    let jwt: string
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      jwt = authHeader.substring(7)
+    } else {
+      // Fallback: generate JWT with private role for fetching payment methods
+      const config = getJWTConfig()
+      const defaultUserId = process.env.NEXT_PUBLIC_DEFAULT_USER_ID || 'user123'
+      jwt = await generateJWT(defaultUserId, config, ['private'])
+    }
 
     console.log('📋 Fetching payment methods for project:', PROJECT_ID)
 

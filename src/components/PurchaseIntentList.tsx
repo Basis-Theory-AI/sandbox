@@ -178,7 +178,14 @@ export function PurchaseIntentList({
     try {
       console.log('🃏 Fetching card details for intent:', intent.id)
       
-      const response = await fetch(`/api/purchase-intents/${intent.id}/details`)
+      const headers: HeadersInit = {}
+      
+      // Add JWT if provided (should have private role for fetching purchase intent details)
+      if (jwt) {
+        headers['Authorization'] = `Bearer ${jwt}`
+      }
+      
+      const response = await fetch(`/api/purchase-intents/${intent.id}/details`, { headers })
       const data = await response.json()
 
       if (!response.ok) {

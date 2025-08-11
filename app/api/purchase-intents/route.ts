@@ -8,31 +8,41 @@ const PROJECT_ID = process.env.JWT_PROJECT_ID
 const DEFAULT_MANDATES = [
   {
     type: "maxAmount",
-    value: "500.00",
+    value: "500",
     details: {
-      currency: "840", // USD
-      period: "monthly"
+      currency: "840"
     }
   },
   {
-    type: "merchantMcc",
-    value: "5999", // Miscellaneous retail stores
+    type: "merchant",
+    value: "Apple Store",
     details: {
-      allowed: true,
-      description: "Miscellaneous retail stores"
+      category: "electronics",
+      categoryCode: "5732"
     }
+  },
+  {
+    type: "description",
+    value: "Purchase of AirPods Pro and iPhone case"
   },
   {
     type: "expirationTime",
-    value: "2025-12-31T23:59:59Z",
+    value: "1735690745"
+  },
+  {
+    type: "prompt",
+    value: "The purchase of electronics under US$500 at Apple Store by the end of the day"
+  },
+  {
+    type: "consumer",
+    value: "3d50aca6-9d1e-4459-8254-4171a92f5bd0",
     details: {
-      timezone: "UTC",
-      autoRenew: false
+      email: "lucas@basistheory.com"
     }
   }
 ]
 
-// POST - Create Purchase Intent
+// POST - Create Purchase Intent (requires private role)
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -46,10 +56,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate JWT for API authentication
-    const config = getJWTConfig()
-    const defaultUserId = entityId || 'user123'
-    const jwt = await generateJWT(defaultUserId, config, ['private'])
+    // Get JWT from Authorization header or generate default with private role
+    const authHeader = request.headers.get('Authorization')
+    let jwt: string
+    let defaultUserId: string
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      jwt = authHeader.substring(7)
+      defaultUserId = entityId || process.env.NEXT_PUBLIC_DEFAULT_USER_ID || 'user123'
+    } else {
+      // Fallback: generate JWT with private role for purchase intent creation
+      const config = getJWTConfig()
+      defaultUserId = entityId || process.env.NEXT_PUBLIC_DEFAULT_USER_ID || 'user123'
+      jwt = await generateJWT(defaultUserId, config, ['private'])
+    }
 
     // Prepare purchase intent data with default mandates
     const purchaseIntentData = {
@@ -102,13 +122,21 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET - List Purchase Intents
-export async function GET() {
+// GET - List Purchase Intents (requires private role)
+export async function GET(request: NextRequest) {
   try {
-    // Generate JWT for API authentication
-    const config = getJWTConfig()
-    const defaultUserId = 'user123'
-    const jwt = await generateJWT(defaultUserId, config, ['private'])
+    // Get JWT from Authorization header or generate default with private role
+    const authHeader = request.headers.get('Authorization')
+    let jwt: string
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      jwt = authHeader.substring(7)
+    } else {
+      // Fallback: generate JWT with private role for fetching purchase intents
+      const config = getJWTConfig()
+      const defaultUserId = process.env.NEXT_PUBLIC_DEFAULT_USER_ID || 'user123'
+      jwt = await generateJWT(defaultUserId, config, ['private'])
+    }
 
     console.log('📋 Fetching purchase intents for project:', PROJECT_ID)
 
