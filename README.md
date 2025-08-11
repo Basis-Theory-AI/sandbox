@@ -59,6 +59,7 @@ YOUR_PRIVATE_KEY_HERE
 -----END PRIVATE KEY-----"
 
 # Application Configuration
+NEXT_PUBLIC_PROJECT_ID=your-basis-theory-project-id
 NEXT_PUBLIC_DEFAULT_USER_ID=example-user-123
 NEXT_PUBLIC_DEFAULT_ROLES=private
 
