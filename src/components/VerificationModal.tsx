@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { 
   BasisTheoryProvider, 
   useBasisTheory
@@ -37,6 +37,7 @@ export function VerificationModal({
   const [state, setState] = useState<VerificationState>('STARTING')
   const [error, setError] = useState<string | null>(null)
   const [progress, setProgress] = useState(0)
+  const verificationStartedRef = useRef(false)
 
 
   const getBrandStyle = (brand: string) => {
@@ -67,11 +68,18 @@ export function VerificationModal({
   const startVerification = async () => {
     console.log('🚀 Starting verification using SDK only...')
     
+    // Prevent double execution using ref
+    if (verificationStartedRef.current) {
+      console.log('⚠️ Verification already in progress (ref check), skipping duplicate call')
+      return
+    }
+    
     if (state !== 'STARTING') {
-      console.log('⚠️ Verification already started, skipping...', { currentState: state })
+      console.log('⚠️ Verification already started (state check), skipping...', { currentState: state })
       return
     }
 
+    verificationStartedRef.current = true
     setState('PROCESSING')
     setProgress(10)
     setError(null)
@@ -121,11 +129,15 @@ export function VerificationModal({
     if (state === 'PROCESSING' || state === 'STARTING') {
       return
     }
+    // Reset the ref when closing
+    verificationStartedRef.current = false
     onClose()
   }
 
   const handleRetry = () => {
     console.log('🔄 Retry button clicked, resetting state...')
+    // Reset the ref to allow retry
+    verificationStartedRef.current = false
     setState('STARTING')
     setError(null)
     setProgress(0)
@@ -134,6 +146,14 @@ export function VerificationModal({
       startVerification()
     }, 10)
   }
+
+  // Reset ref when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      // Reset the ref when modal opens
+      verificationStartedRef.current = false
+    }
+  }, [isOpen])
 
   // Auto-start verification when modal opens
   useEffect(() => {
@@ -145,9 +165,12 @@ export function VerificationModal({
         intentId: intent.id
       })
       
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         startVerification()
       }, 100)
+      
+      // Cleanup timer on unmount
+      return () => clearTimeout(timer)
     }
   }, [isOpen, state])
 
@@ -197,7 +220,7 @@ export function VerificationModal({
         <div className="text-center">
           {state === 'STARTING' && (
             <div className="space-y-4">
-              <div className="w-12 h-12 border-2 border-[#a1a1aa] border-t-[#bff660] rounded-full animate-spin mx-auto"/>
+              <div className="w-16 h-16 border-4 border-[#a1a1aa]/20 border-t-[#bff660] rounded-full animate-spin mx-auto"/>
               <div>
                 <h4 className="text-lg font-semibold text-[#f4f4f5] mb-2">Initializing Verification</h4>
                 <p className="text-[#a1a1aa] text-sm">Setting up secure authentication...</p>
@@ -207,12 +230,7 @@ export function VerificationModal({
 
           {state === 'PROCESSING' && (
             <div className="space-y-4">
-              <div className="w-16 h-16 mx-auto">
-                <svg className="w-16 h-16 text-[#bff660]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 12 12" to="360 12 12" dur="2s" repeatCount="indefinite"/>
-                </svg>
-              </div>
+              <div className="w-16 h-16 border-4 border-[#a1a1aa]/20 border-t-[#bff660] rounded-full animate-spin mx-auto"/>
               <div>
                 <h4 className="text-lg font-semibold text-[#f4f4f5] mb-2">Verifying Payment</h4>
                 <p className="text-[#a1a1aa] text-sm">Please wait while we verify your payment method...</p>
