@@ -157,6 +157,13 @@ export function PaymentMethodList({
               details: {
                 description: 'BasisTheory AI Demo'
               }
+            },
+            {
+              type: 'consumer',
+              value: '3d50aca6-9d1e-4459-8254-4171a92f5bd0',
+              details: {
+                email: 'lucas@basistheory.com'
+              }
             }
           ]
         })
