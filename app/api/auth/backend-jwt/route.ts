@@ -12,7 +12,7 @@ interface JWTResponse {
         iat: number
     }
 }
-
+export const fetchCache = 'force-no-store';
 // GET /api/auth/backend-jwt - Get the backend JWT used for API calls
 export async function GET() {
     try {
