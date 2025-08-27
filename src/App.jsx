@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import {
+  BasisTheoryProvider,
   useBasisTheory,
   verifyPurchaseIntentWithPasskey,
   visaIframeManager
@@ -392,7 +393,12 @@ function PurchaseIntentDemo() {
 
 function App() {
   return (
-    <PurchaseIntentDemo />
+    <BasisTheoryProvider
+      apiKey={HARDCODED_API_KEY}
+      environment="sandbox"
+    >
+      <PurchaseIntentDemo />
+    </BasisTheoryProvider>
   )
 }
 

@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from 'react'
 import {
-  useBasisTheory
+  useBasisTheory,
+  BasisTheoryProvider
 } from '@basis-theory-ai/react'
-import WebSDK from '@basis-theory-ai/react'
 import { useJWT } from '../src/hooks/useJWT'
 import { JWTStatus } from '../src/components/JWTStatus'
 import { PaymentMethodCreator } from '../src/components/PaymentMethodCreator'
@@ -481,8 +481,8 @@ function AppContent({ jwt }: { jwt: string }) {
           <button
             onClick={() => setActiveTab('authentication')}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${activeTab === 'authentication'
-                ? 'bg-[#bff660] text-[#131316]'
-                : 'text-[#a1a1aa] hover:text-[#e4e4e7] hover:bg-white/5'
+              ? 'bg-[#bff660] text-[#131316]'
+              : 'text-[#a1a1aa] hover:text-[#e4e4e7] hover:bg-white/5'
               }`}
           >
             Authentication
@@ -490,8 +490,8 @@ function AppContent({ jwt }: { jwt: string }) {
           <button
             onClick={() => setActiveTab('payment-methods')}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${activeTab === 'payment-methods'
-                ? 'bg-[#bff660] text-[#131316]'
-                : 'text-[#a1a1aa] hover:text-[#e4e4e7] hover:bg-white/5'
+              ? 'bg-[#bff660] text-[#131316]'
+              : 'text-[#a1a1aa] hover:text-[#e4e4e7] hover:bg-white/5'
               }`}
           >
             Payment Methods
@@ -499,8 +499,8 @@ function AppContent({ jwt }: { jwt: string }) {
           <button
             onClick={() => setActiveTab('purchase-intents')}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${activeTab === 'purchase-intents'
-                ? 'bg-[#bff660] text-[#131316]'
-                : 'text-[#a1a1aa] hover:text-[#e4e4e7] hover:bg-white/5'
+              ? 'bg-[#bff660] text-[#131316]'
+              : 'text-[#a1a1aa] hover:text-[#e4e4e7] hover:bg-white/5'
               }`}
           >
             Purchase Intents
@@ -597,13 +597,6 @@ function AppContent({ jwt }: { jwt: string }) {
 }
 
 function BasisTheoryDemo({ jwt }: { jwt: string }) {
-  // Initialize WebSDK with JWT
-  useEffect(() => {
-    if (jwt) {
-      WebSDK.init({ apiKey: jwt })
-    }
-  }, [jwt])
-
   const {
     isInitialized,
     isLoading,
@@ -618,7 +611,7 @@ function BasisTheoryDemo({ jwt }: { jwt: string }) {
   // Get Visa status from hook
   const visaStatus = getVisaStatus()
 
-  // Visa is now initialized by the WebSDK.init() call above
+  // Visa is now initialized by the BasisTheoryProvider
 
   if (initError) {
     return (
@@ -718,6 +711,8 @@ export default function Home() {
   }
 
   return (
-    <BasisTheoryDemo jwt={jwt} />
+    <BasisTheoryProvider apiKey={jwt}>
+      <BasisTheoryDemo jwt={jwt} />
+    </BasisTheoryProvider>
   )
 } 

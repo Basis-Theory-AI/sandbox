@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import {
-  useBasisTheory
+  useBasisTheory,
+  BasisTheoryProvider
 } from '@basis-theory-ai/react'
 
 type VerificationState =
