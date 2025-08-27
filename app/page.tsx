@@ -1,15 +1,21 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import {
-  useBasisTheory,
-  BasisTheoryProvider
-} from '@basis-theory-ai/react'
+import dynamic from 'next/dynamic'
 import { useJWT } from '../src/hooks/useJWT'
 import { JWTStatus } from '../src/components/JWTStatus'
 import { PaymentMethodCreator } from '../src/components/PaymentMethodCreator'
 import { PaymentMethodList } from '../src/components/PaymentMethodList'
 import { PurchaseIntentList } from '../src/components/PurchaseIntentList'
+
+// Import BasisTheory hook directly
+import { useBasisTheory } from '@basis-theory-ai/react'
+
+// Dynamically import the client-only wrapper
+const ClientOnlyBasisTheory = dynamic(
+  () => import('../src/components/ClientOnlyBasisTheory'),
+  { ssr: false }
+)
 
 // BasisTheory Logo Component
 function BasisTheoryLogo({ className = "w-32 h-auto" }: { className?: string }) {
@@ -711,8 +717,8 @@ export default function Home() {
   }
 
   return (
-    <BasisTheoryProvider apiKey={jwt}>
+    <ClientOnlyBasisTheory jwt={jwt}>
       <BasisTheoryDemo jwt={jwt} />
-    </BasisTheoryProvider>
+    </ClientOnlyBasisTheory>
   )
 } 

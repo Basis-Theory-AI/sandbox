@@ -33,7 +33,8 @@ export function VerificationModal({
   onSuccess,
   onError
 }: VerificationModalProps) {
-  const { verifyPurchaseIntent } = useBasisTheory()
+  const basisTheoryHook = useBasisTheory()
+  const { verifyPurchaseIntent } = basisTheoryHook || { verifyPurchaseIntent: null }
   const [state, setState] = useState<VerificationState>('STARTING')
   const [error, setError] = useState<string | null>(null)
   const [progress, setProgress] = useState(0)
@@ -95,6 +96,11 @@ export function VerificationModal({
 
       // Use ONLY the SDK method - no custom API calls
       console.log('🔄 Calling verifyPurchaseIntent from SDK...')
+
+      if (!verifyPurchaseIntent) {
+        throw new Error('BasisTheory SDK not properly initialized')
+      }
+
       const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || '00000000-0000-0000-0000-000000000000' // Fallback project ID
       const result = await verifyPurchaseIntent(projectId, intent.id)
 
