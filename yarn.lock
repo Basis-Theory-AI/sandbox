@@ -7,8 +7,13 @@
   resolved "https://registry.yarnpkg.com/@alloc/quick-lru/-/quick-lru-5.2.0.tgz#7bf68b20c0a350f936915fcae06f58e32007ce30"
   integrity sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==
 
-"@basis-theory-ai/react@file:../react/dist":
-  version "0.0.0"
+"@basis-theory-ai/react@1.0.1-beta.6":
+  version "1.0.1-beta.6"
+  resolved "https://registry.yarnpkg.com/@basis-theory-ai/react/-/react-1.0.1-beta.6.tgz#ab14b8943cc93f08416495e30e5ecbb67d80d1e9"
+  integrity sha512-AKD9EX4BUFbSSctoAGelXlipoawRf/UPFIU14YA15i8lSYYblhQThOClNMLYJEX+iY/Y9pl4aDd1dV4NnfMdZA==
+  dependencies:
+    react "^18.2.0"
+    react-dom "^18.2.0"
 
 "@isaacs/cliui@^8.0.2":
   version "8.0.2"

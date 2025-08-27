@@ -31,7 +31,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@basis-theory-ai/react": "file:../react/dist",
+    "@basis-theory-ai/react": "1.0.1-beta.6",
     "jose": "^5.0.0",
     "next": "^13.5.0",
     "react": "^18.2.0",
