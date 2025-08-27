@@ -7,11 +7,11 @@ import {
 } from '@basis-theory-ai/react'
 
 // Hardcoded API key for testing (replace with your actual sandbox key)
-const HARDCODED_API_KEY = 'key_your-basis-theory-sandbox-api-key-here'
+const HARDCODED_API_KEY = 'eyJhbGciOiJSUzI1NiIsImtpZCI6ImVjYThmN2MyLTYzOTMtNGM2MC04MGU2LTRlNjY0NDFmYzFlMyJ9.eyJzdWIiOiJleGFtcGxlLXVzZXItMTIzIiwiaXNzIjoiNmY0OGZiNzQtNmU0Ni00NjQ1LWE5YzEtZGVjZDJkY2VhNzM5Iiwicm9sZXMiOlsicHJpdmF0ZSJdLCJpYXQiOjE3NTU5MTkzNTQsImV4cCI6MTc1NTkyMjk1NH0.UGjmD0EVZgiFNk99lULXNyISiPZjnGeeTIaHF-t8s9b9ZhinC6-aEAb_qXK8yj_4dmtDqCS3Gyy3jPnQtw2I2deFpNkfZhRLp_KcV_uOCb5TJqsTwQOaBTYIleEACs05UfreCYEdZP-6jL9TuXz510jN-S9crBLWtqIQR0jJpIyHB6yajGKzG53gTywhCeRvNa8ck6MPspyh5XFHyepq-1RixCIUE-zXbjOqjUgJpCUF5Biw46OaECK2UQJ7nA5htBq05-0sIGAh5UyHLORvlUEBd5o31mWAI2GV1TOijE2q5H-BVvx2ZCqDQXZNqkNjDM7b3nieYHPG_ZvyS2DIzweyJhbGciOiJSUzI1NiIsImtpZCI6ImVjYThmN2MyLTYzOTMtNGM2MC04MGU2LTRlNjY0NDFmYzFlMyJ9.eyJzdWIiOiJ1c2VyMTIzIiwiaXNzIjoiNmY0OGZiNzQtNmU0Ni00NjQ1LWE5YzEtZGVjZDJkY2VhNzM5Iiwicm9sZXMiOlsicHVibGljIl0sImlhdCI6MTc1NTkxOTYzMSwiZXhwIjoxNzU1OTIzMjMxfQ.X8HtECe_71hFTJ24hKLJ2pO2m_PvtU5Jo4u2O4gkwmXqYTMNE0ljgecC7JIjGM1xnwwfIVKwmq4peIesFjUw_D-XNtnzggIPCXvQNAVcFZOrdiS6vNWLfKepiVXgHF4mhOQu50_mec2Q-ZsPB72-DDKnaQ5cDQ5XBs37svg6dbU-ddB1v1Ug0l4hxuSV5LgwWB13N5Uc7cJdpkpl4attFVQ4f8fiJGvlgI96MC5edYn3VPHVnGv4tgWQbOgj7LZT2zmoltoN7Dou631PglPc3Cz2vbFPR9n_u0xmObALVUISGJbB8Rtz5kPHTMAHsYQhsAmj2Os1K_BtA1k4jWeLDw'
 
 function PurchaseIntentDemo() {
   const { isInitialized, isLoading, initError, getStatus } = useBasisTheory()
-  
+
   // Visa SDK state
   const [visaStatus, setVisaStatus] = useState({
     isReady: false,
@@ -23,11 +23,11 @@ function PurchaseIntentDemo() {
   // Initialize Visa iframe manager
   useEffect(() => {
     console.log('🚀 Initializing Visa iframe manager...')
-    
+
     try {
       // Initialize the Visa iframe manager
       visaIframeManager.initialize()
-      
+
       // Set up event listeners
       visaIframeManager.addEventListener('sessionReady', (session) => {
         console.log('✅ Visa session ready:', session)
@@ -38,7 +38,7 @@ function PurchaseIntentDemo() {
           session: session
         })
       })
-      
+
       visaIframeManager.addEventListener('error', (error) => {
         console.error('❌ Visa error:', error)
         setVisaStatus({
@@ -48,7 +48,7 @@ function PurchaseIntentDemo() {
           session: null
         })
       })
-      
+
     } catch (error) {
       console.error('❌ Failed to initialize Visa iframe manager:', error)
       setVisaStatus({
@@ -58,7 +58,7 @@ function PurchaseIntentDemo() {
         session: null
       })
     }
-    
+
     // Cleanup on unmount
     return () => {
       visaIframeManager.cleanup()
@@ -68,27 +68,27 @@ function PurchaseIntentDemo() {
   const handleVerifyPurchaseIntent = async () => {
     try {
       console.log('🔄 Starting purchase intent verification with passkey...')
-      
+
       // Get iframe session data
       const iframeData = visaIframeManager.getSession()
       if (!iframeData) {
         throw new Error('Visa session not ready - please wait for initialization')
       }
-      
+
       // Test data (replace with real data in production)
       const projectId = '00000000-0000-0000-0000-000000000000'
       const intentId = 'e8abccae-3876-4325-8706-e37931685d1c'
-      
+
       const result = await verifyPurchaseIntentWithPasskey(
         projectId,
         intentId,
         iframeData,
         { apiKey: HARDCODED_API_KEY }
       )
-      
+
       console.log('✅ Purchase intent verification successful:', result)
       alert(`Success! Status: ${result.status}. Check console for details.`)
-      
+
     } catch (error) {
       console.error('❌ Purchase intent verification failed:', error)
       alert(`Verification failed: ${error.message}`)
@@ -137,7 +137,7 @@ function PurchaseIntentDemo() {
         }} />
         <h3>Loading SDK...</h3>
         <p style={{ color: '#666', textAlign: 'center' }}>
-          {isLoading && 'Loading BasisTheory SDK...'}<br/>
+          {isLoading && 'Loading BasisTheory SDK...'}<br />
           {visaStatus.isLoading && 'Loading Visa SDK...'}
         </p>
         <style>{`
@@ -344,7 +344,7 @@ function PurchaseIntentDemo() {
             🔍 Check SDK Status
           </button>
         </div>
-        
+
         {!isReadyForVerification && (
           <div style={{
             marginTop: '15px',
