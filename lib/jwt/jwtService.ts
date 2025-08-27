@@ -27,7 +27,7 @@ function formatPrivateKey(key: string): string {
         .replace(/\s+/g, ' ')   // Normalize whitespace
         .replace(/-----BEGIN PRIVATE KEY----- /g, '-----BEGIN PRIVATE KEY-----\n')
         .replace(/ -----END PRIVATE KEY-----/g, '\n-----END PRIVATE KEY-----')
-        .replace(/-----BEGIN PRIVATE KEY-----\n(.+)\n-----END PRIVATE KEY-----/s, (match, content) => {
+        .replace(/-----BEGIN PRIVATE KEY-----\n([\s\S]+)\n-----END PRIVATE KEY-----/, (match, content) => {
             // Split the content into 64-character lines
             const cleanContent = content.replace(/\s/g, '');
             const lines = [];

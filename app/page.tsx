@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { 
-  BasisTheoryProvider, 
+import {
   useBasisTheory
 } from '@basis-theory-ai/react'
+import WebSDK from '@basis-theory-ai/react'
 import { useJWT } from '../src/hooks/useJWT'
 import { JWTStatus } from '../src/components/JWTStatus'
 import { PaymentMethodCreator } from '../src/components/PaymentMethodCreator'
@@ -58,7 +58,7 @@ function AuthenticationTab({ defaultJWT, onJWTUpdate }: { defaultJWT: string, on
       try {
         const response = await fetch('/api/auth/backend-jwt')
         const data = await response.json()
-        
+
         if (response.ok) {
           setBackendJWT(data.jwt)
           // Notify parent when backend JWT is loaded
@@ -202,13 +202,13 @@ function AuthenticationTab({ defaultJWT, onJWTUpdate }: { defaultJWT: string, on
             <p className="text-xs text-[#a1a1aa]">Used to Create/Fetch Purchase Intents and Fetch Payment Methods</p>
           </div>
           <div className="flex gap-2">
-                          <button
-                onClick={() => createJWT(['private'], true)}
-                disabled={isCreatingBackend}
-                className="px-3 py-1.5 bg-[#bff660] text-[#131316] text-xs font-medium rounded-lg hover:bg-[#b2f63d] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
-              >
-                {isCreatingBackend ? 'Refreshing...' : 'Refresh'}
-              </button>
+            <button
+              onClick={() => createJWT(['private'], true)}
+              disabled={isCreatingBackend}
+              className="px-3 py-1.5 bg-[#bff660] text-[#131316] text-xs font-medium rounded-lg hover:bg-[#b2f63d] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
+            >
+              {isCreatingBackend ? 'Refreshing...' : 'Refresh'}
+            </button>
             {backendJWT && (
               <button
                 onClick={() => handleCopy(backendJWT, true)}
@@ -219,25 +219,25 @@ function AuthenticationTab({ defaultJWT, onJWTUpdate }: { defaultJWT: string, on
             )}
           </div>
         </div>
-                 {isLoadingBackendJWT ? (
-           <div className="bg-black/30 rounded-lg p-3 text-xs text-[#a1a1aa] text-center flex items-center justify-center gap-2">
-             <div className="w-3 h-3 border border-[#a1a1aa] border-t-[#bff660] rounded-full animate-spin"></div>
-             Loading backend JWT...
-           </div>
-         ) : backendJWT ? (
-           <>
-             <div className="bg-black/30 rounded-lg p-3 font-mono text-xs text-[#bff660] overflow-hidden mb-3">
-               <div className="break-all">{backendJWT}</div>
-             </div>
-             <div className="bg-black/30 rounded-lg p-3 font-mono text-xs text-[#a1a1aa] max-h-32 overflow-y-auto">
-               <pre className="whitespace-pre-wrap">{JSON.stringify(decodeJWT(backendJWT), null, 2)}</pre>
-             </div>
-           </>
-         ) : (
-           <div className="bg-black/30 rounded-lg p-3 text-xs text-[#a1a1aa] text-center">
-             Failed to load backend JWT
-           </div>
-         )}
+        {isLoadingBackendJWT ? (
+          <div className="bg-black/30 rounded-lg p-3 text-xs text-[#a1a1aa] text-center flex items-center justify-center gap-2">
+            <div className="w-3 h-3 border border-[#a1a1aa] border-t-[#bff660] rounded-full animate-spin"></div>
+            Loading backend JWT...
+          </div>
+        ) : backendJWT ? (
+          <>
+            <div className="bg-black/30 rounded-lg p-3 font-mono text-xs text-[#bff660] overflow-hidden mb-3">
+              <div className="break-all">{backendJWT}</div>
+            </div>
+            <div className="bg-black/30 rounded-lg p-3 font-mono text-xs text-[#a1a1aa] max-h-32 overflow-y-auto">
+              <pre className="whitespace-pre-wrap">{JSON.stringify(decodeJWT(backendJWT), null, 2)}</pre>
+            </div>
+          </>
+        ) : (
+          <div className="bg-black/30 rounded-lg p-3 text-xs text-[#a1a1aa] text-center">
+            Failed to load backend JWT
+          </div>
+        )}
       </div>
     </div>
   )
@@ -267,7 +267,7 @@ function PaymentMethodModal({ isOpen, onClose, onPaymentMethodCreated, onError, 
             </svg>
           </button>
         </div>
-        
+
         <PaymentMethodCreator
           onPaymentMethodCreated={(pm) => {
             onPaymentMethodCreated?.(pm)
@@ -284,7 +284,7 @@ function PaymentMethodModal({ isOpen, onClose, onPaymentMethodCreated, onError, 
 function AppContent({ jwt }: { jwt: string }) {
   const { getVisaStatus } = useBasisTheory()
   const visaStatus = getVisaStatus()
-  
+
   const [paymentMethods, setPaymentMethods] = useState([])
   const [purchaseIntents, setPurchaseIntents] = useState([])
   const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(false)
@@ -293,16 +293,16 @@ function AppContent({ jwt }: { jwt: string }) {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'authentication' | 'payment-methods' | 'purchase-intents'>('authentication')
   const [paymentModalOpen, setPaymentModalOpen] = useState(false)
-  
+
   // Manage JWTs with different roles
   const [publicJWT, setPublicJWT] = useState(jwt) // For payment method creation (default has public role)
   const [privateJWT, setPrivateJWT] = useState<string | null>(null) // For everything else
-  
+
   const handleJWTUpdate = (publicToken: string, privateToken: string) => {
     setPublicJWT(publicToken)
     setPrivateJWT(privateToken)
   }
-  
+
   // Initialize private JWT on mount and then fetch data
   useEffect(() => {
     const initializeAndFetch = async () => {
@@ -312,7 +312,7 @@ function AppContent({ jwt }: { jwt: string }) {
         const data = await response.json()
         if (response.ok) {
           setPrivateJWT(data.jwt)
-          
+
           // Now fetch data with the private JWT
           // Fetch payment methods with private JWT
           setLoadingPaymentMethods(true)
@@ -331,7 +331,7 @@ function AppContent({ jwt }: { jwt: string }) {
           } finally {
             setLoadingPaymentMethods(false)
           }
-          
+
           // Fetch purchase intents with private JWT
           setLoadingPurchaseIntents(true)
           try {
@@ -369,11 +369,11 @@ function AppContent({ jwt }: { jwt: string }) {
         }
       })
       const data = await response.json()
-      
+
       if (!response.ok) {
         throw new Error(data.error || 'Failed to fetch payment methods')
       }
-      
+
       setPaymentMethods(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -394,11 +394,11 @@ function AppContent({ jwt }: { jwt: string }) {
         }
       })
       const data = await response.json()
-      
+
       if (!response.ok) {
         throw new Error(data.error || 'Failed to fetch purchase intents')
       }
-      
+
       setPurchaseIntents(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -432,13 +432,13 @@ function AppContent({ jwt }: { jwt: string }) {
 
   const handleVerificationCompleted = (intentId: string, result: any) => {
     console.log(`✅ Verification completed for intent: ${intentId}`, result)
-    
+
     if (result.status === 'VERIFIED' || result.status === 'ACTIVE') {
       setSuccessMessage(`Purchase Intent ${result.status === 'VERIFIED' ? 'Verified' : 'Activated'} Successfully!`)
     } else {
       setSuccessMessage('Verification step completed - check the intent status')
     }
-    
+
     setError(null)
     setTimeout(() => setSuccessMessage(null), 5000)
   }
@@ -457,7 +457,7 @@ function AppContent({ jwt }: { jwt: string }) {
             <div className="flex items-center gap-4">
               <BasisTheoryLogo className="w-28 h-auto" />
             </div>
-            
+
             {/* Status Indicators */}
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
@@ -480,31 +480,28 @@ function AppContent({ jwt }: { jwt: string }) {
         <div className="flex gap-1 mb-6 bg-white/5 backdrop-blur rounded-xl p-1 w-fit">
           <button
             onClick={() => setActiveTab('authentication')}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-              activeTab === 'authentication'
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${activeTab === 'authentication'
                 ? 'bg-[#bff660] text-[#131316]'
                 : 'text-[#a1a1aa] hover:text-[#e4e4e7] hover:bg-white/5'
-            }`}
+              }`}
           >
             Authentication
           </button>
           <button
             onClick={() => setActiveTab('payment-methods')}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-              activeTab === 'payment-methods'
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${activeTab === 'payment-methods'
                 ? 'bg-[#bff660] text-[#131316]'
                 : 'text-[#a1a1aa] hover:text-[#e4e4e7] hover:bg-white/5'
-            }`}
+              }`}
           >
             Payment Methods
           </button>
           <button
             onClick={() => setActiveTab('purchase-intents')}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-              activeTab === 'purchase-intents'
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${activeTab === 'purchase-intents'
                 ? 'bg-[#bff660] text-[#131316]'
                 : 'text-[#a1a1aa] hover:text-[#e4e4e7] hover:bg-white/5'
-            }`}
+              }`}
           >
             Purchase Intents
           </button>
@@ -600,122 +597,127 @@ function AppContent({ jwt }: { jwt: string }) {
 }
 
 function BasisTheoryDemo({ jwt }: { jwt: string }) {
-    const { 
-        isInitialized, 
-        isLoading, 
-        initError, 
-        getStatus,
-        getVisaStatus,
-        isVisaReady,
-        visaSession,
-        visaError 
-    } = useBasisTheory()
-
-    // Get Visa status from hook
-    const visaStatus = getVisaStatus()
-
-    // Visa is now initialized by the BasisTheoryProvider automatically
-
-    if (initError) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-[#131316] text-[#f4f4f5] font-['Inter',sans-serif]">
-                <div className="text-center p-8 bg-white/5 backdrop-blur rounded-xl border border-white/10 max-w-md">
-                    <div className="text-red-500 text-4xl mb-4">❌</div>
-                    <h2 className="text-xl font-semibold text-[#f4f4f5] mb-2">
-                        BasisTheory Initialization Failed
-                    </h2>
-                    <p className="text-[#a1a1aa] mb-4 text-sm">
-                        {initError.message}
-                    </p>
-                    <button 
-                        onClick={() => window.location.reload()}
-                        className="bg-[#bff660] text-[#131316] px-4 py-2 rounded-lg hover:bg-[#b2f63d] transition-colors text-sm font-medium"
-                    >
-                        Retry
-                    </button>
-                </div>
-            </div>
-        )
+  // Initialize WebSDK with JWT
+  useEffect(() => {
+    if (jwt) {
+      WebSDK.init({ apiKey: jwt })
     }
+  }, [jwt])
 
-    if (!isInitialized) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-[#131316] text-[#f4f4f5] font-['Inter',sans-serif]">
-                <div className="text-center">
-                    <div className="w-10 h-10 border-2 border-[#a1a1aa] border-t-[#bff660] rounded-full animate-spin mx-auto mb-4"></div>
-                    <h2 className="text-xl font-semibold text-[#f4f4f5] mb-2">
-                        Initializing BasisTheory SDK...
-                    </h2>
-                    <p className="text-[#a1a1aa] text-sm">
-                        Setting up secure payment environment
-                    </p>
-                </div>
-            </div>
-        )
-    }
+  const {
+    isInitialized,
+    isLoading,
+    initError,
+    getStatus,
+    getVisaStatus,
+    isVisaReady,
+    visaSession,
+    visaError
+  } = useBasisTheory()
 
-    return <AppContent jwt={jwt} />
+  // Get Visa status from hook
+  const visaStatus = getVisaStatus()
+
+  // Visa is now initialized by the WebSDK.init() call above
+
+  if (initError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#131316] text-[#f4f4f5] font-['Inter',sans-serif]">
+        <div className="text-center p-8 bg-white/5 backdrop-blur rounded-xl border border-white/10 max-w-md">
+          <div className="text-red-500 text-4xl mb-4">❌</div>
+          <h2 className="text-xl font-semibold text-[#f4f4f5] mb-2">
+            BasisTheory Initialization Failed
+          </h2>
+          <p className="text-[#a1a1aa] mb-4 text-sm">
+            {initError.message}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-[#bff660] text-[#131316] px-4 py-2 rounded-lg hover:bg-[#b2f63d] transition-colors text-sm font-medium"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isInitialized) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#131316] text-[#f4f4f5] font-['Inter',sans-serif]">
+        <div className="text-center">
+          <div className="w-10 h-10 border-2 border-[#a1a1aa] border-t-[#bff660] rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-[#f4f4f5] mb-2">
+            Initializing BasisTheory SDK...
+          </h2>
+          <p className="text-[#a1a1aa] text-sm">
+            Setting up secure payment environment
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  return <AppContent jwt={jwt} />
 }
 
 export default function Home() {
-    const jwtHook = useJWT()
-    const { jwt, isLoading, error } = jwtHook
+  const jwtHook = useJWT()
+  const { jwt, isLoading, error } = jwtHook
 
-    if (isLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-[#131316] text-[#f4f4f5] font-['Inter',sans-serif]">
-                <div className="text-center p-8">
-                    <div className="w-10 h-10 border-2 border-[#a1a1aa] border-t-[#bff660] rounded-full animate-spin mx-auto mb-4"></div>
-                    <h2 className="text-xl font-semibold text-[#f4f4f5] mb-2">
-                        Generating Authentication Token...
-                    </h2>
-                    <p className="text-[#a1a1aa] text-sm">
-                        Setting up secure session
-                    </p>
-                </div>
-            </div>  
-        )
-    }
-
-    if (error) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-[#131316] text-[#f4f4f5] font-['Inter',sans-serif]">
-                <div className="text-center p-8 bg-white/5 backdrop-blur rounded-xl border border-white/10 max-w-md">
-                    <div className="text-red-500 text-4xl mb-4">⚠️</div>
-                    <h2 className="text-xl font-semibold text-[#f4f4f5] mb-2">
-                        Authentication Error
-                    </h2>
-                    <p className="text-[#a1a1aa] mb-4 text-sm">
-                        {error}
-                    </p>
-                    <JWTStatus 
-                        {...jwtHook} 
-                        onRefresh={jwtHook.refreshJWT}
-                    />
-                </div>
-            </div>
-        )
-    }
-
-    if (!jwt) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-[#131316] text-[#f4f4f5] font-['Inter',sans-serif]">
-                <div className="text-center">
-                    <div className="w-10 h-10 border-2 border-[#a1a1aa] border-t-[#bff660] rounded-full animate-spin mx-auto mb-4"></div>
-                    <h2 className="text-xl font-semibold text-[#f4f4f5] mb-2">
-                        Setting up Authentication...
-                    </h2>
-                    <p className="text-[#a1a1aa] text-sm">
-                        Generating secure tokens
-                    </p>
-                </div>
-            </div>
-        )
-    }
-
+  if (isLoading) {
     return (
-        <BasisTheoryProvider apiKey={jwt}>
-            <BasisTheoryDemo jwt={jwt} />
-        </BasisTheoryProvider>
+      <div className="min-h-screen flex items-center justify-center bg-[#131316] text-[#f4f4f5] font-['Inter',sans-serif]">
+        <div className="text-center p-8">
+          <div className="w-10 h-10 border-2 border-[#a1a1aa] border-t-[#bff660] rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-[#f4f4f5] mb-2">
+            Generating Authentication Token...
+          </h2>
+          <p className="text-[#a1a1aa] text-sm">
+            Setting up secure session
+          </p>
+        </div>
+      </div>
     )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#131316] text-[#f4f4f5] font-['Inter',sans-serif]">
+        <div className="text-center p-8 bg-white/5 backdrop-blur rounded-xl border border-white/10 max-w-md">
+          <div className="text-red-500 text-4xl mb-4">⚠️</div>
+          <h2 className="text-xl font-semibold text-[#f4f4f5] mb-2">
+            Authentication Error
+          </h2>
+          <p className="text-[#a1a1aa] mb-4 text-sm">
+            {error}
+          </p>
+          <JWTStatus
+            {...jwtHook}
+            onRefresh={jwtHook.refreshJWT}
+          />
+        </div>
+      </div>
+    )
+  }
+
+  if (!jwt) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#131316] text-[#f4f4f5] font-['Inter',sans-serif]">
+        <div className="text-center">
+          <div className="w-10 h-10 border-2 border-[#a1a1aa] border-t-[#bff660] rounded-full animate-spin mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-[#f4f4f5] mb-2">
+            Setting up Authentication...
+          </h2>
+          <p className="text-[#a1a1aa] text-sm">
+            Generating secure tokens
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <BasisTheoryDemo jwt={jwt} />
+  )
 } 
