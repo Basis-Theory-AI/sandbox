@@ -13,8 +13,8 @@ interface JWTResponse {
     }
 }
 export const fetchCache = 'force-no-store';
-// GET /api/auth/backend-jwt - Get the backend JWT used for API calls
-export async function GET() {
+// POST /api/auth/backend-jwt - Get the backend JWT used for API calls
+export async function POST() {
     try {
         const config = getJWTConfig()
         const defaultUserId = 'user123'
@@ -34,13 +34,13 @@ export async function GET() {
         }
 
         const nextResponse = NextResponse.json(response)
-        
+
         // Prevent caching by Vercel and browsers
         nextResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
         nextResponse.headers.set('Pragma', 'no-cache')
         nextResponse.headers.set('Expires', '0')
         nextResponse.headers.set('Surrogate-Control', 'no-store')
-        
+
         return nextResponse
     } catch (error) {
         console.error('❌ Backend JWT fetch error:', error)
@@ -51,13 +51,13 @@ export async function GET() {
             },
             { status: 500 }
         )
-        
+
         // Prevent caching error responses too
         errorResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
         errorResponse.headers.set('Pragma', 'no-cache')
         errorResponse.headers.set('Expires', '0')
         errorResponse.headers.set('Surrogate-Control', 'no-store')
-        
+
         return errorResponse
     }
 } 

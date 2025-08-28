@@ -62,7 +62,9 @@ function AuthenticationTab({ defaultJWT, onJWTUpdate }: { defaultJWT: string, on
   useEffect(() => {
     const fetchBackendJWT = async () => {
       try {
-        const response = await fetch('/api/auth/backend-jwt')
+        const response = await fetch('/api/auth/backend-jwt', {
+          method: 'POST'
+        })
         const data = await response.json()
 
         if (response.ok) {
@@ -91,9 +93,9 @@ function AuthenticationTab({ defaultJWT, onJWTUpdate }: { defaultJWT: string, on
     try {
       const endpoint = isBackend ? '/api/auth/backend-jwt' : '/api/auth/jwt'
       const response = await fetch(endpoint, {
-        method: isBackend ? 'GET' : 'POST',
-        headers: isBackend ? {} : { 'Content-Type': 'application/json' },
-        body: isBackend ? undefined : JSON.stringify({
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: isBackend ? JSON.stringify({}) : JSON.stringify({
           userId: entityId,
           roles: roles
         })
@@ -314,7 +316,9 @@ function AppContent({ jwt }: { jwt: string }) {
     const initializeAndFetch = async () => {
       try {
         // First, get the private JWT
-        const response = await fetch('/api/auth/backend-jwt')
+        const response = await fetch('/api/auth/backend-jwt', {
+          method: 'POST'
+        })
         const data = await response.json()
         if (response.ok) {
           setPrivateJWT(data.jwt)
