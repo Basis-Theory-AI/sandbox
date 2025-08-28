@@ -56,16 +56,16 @@ function BrandBadge({ brand }: { brand: string }) {
       case 'visa':
         return (
           <svg width="16" height="10" viewBox="0 0 3384.54 2077.85" xmlns="http://www.w3.org/2000/svg">
-            <rect width="3384.54" height="2077.85" rx="150" ry="150" fill="#1434CB"/>
-            <path fill="#FFF" d="M1461.26,739.84l-251.37,599.74h-164l-123.7-478.62c-7.51-29.48-14.04-40.28-36.88-52.7  c-37.29-20.23-98.87-39.21-153.05-50.99l3.68-17.43h263.99c33.65,0,63.9,22.4,71.54,61.15l65.33,347.04l161.46-408.2H1461.26z   M2103.84,1143.77c0.66-158.29-218.88-167.01-217.37-237.72c0.47-21.52,20.96-44.4,65.81-50.24c22.23-2.91,83.48-5.13,152.95,26.84  l27.25-127.18c-37.33-13.55-85.36-26.59-145.12-26.59c-153.35,0-261.27,81.52-262.18,198.25c-0.99,86.34,77.03,134.52,135.81,163.21  c60.47,29.38,80.76,48.26,80.53,74.54c-0.43,40.23-48.23,57.99-92.9,58.69c-77.98,1.2-123.23-21.1-159.3-37.87l-28.12,131.39  c36.25,16.63,103.16,31.14,172.53,31.87C1996.72,1348.96,2103.34,1268.45,2103.84,1143.77 M2508.78,1339.58h143.49l-125.25-599.74  h-132.44c-29.78,0-54.9,17.34-66.02,44l-232.81,555.74h162.91L2291,1250h199.05L2508.78,1339.58z M2335.67,1127.08l81.66-225.18  l47,225.18H2335.67z M1682.93,739.84l-128.29,599.74H1399.5l128.34-599.74H1682.93z"/>
+            <rect width="3384.54" height="2077.85" rx="150" ry="150" fill="#1434CB" />
+            <path fill="#FFF" d="M1461.26,739.84l-251.37,599.74h-164l-123.7-478.62c-7.51-29.48-14.04-40.28-36.88-52.7  c-37.29-20.23-98.87-39.21-153.05-50.99l3.68-17.43h263.99c33.65,0,63.9,22.4,71.54,61.15l65.33,347.04l161.46-408.2H1461.26z   M2103.84,1143.77c0.66-158.29-218.88-167.01-217.37-237.72c0.47-21.52,20.96-44.4,65.81-50.24c22.23-2.91,83.48-5.13,152.95,26.84  l27.25-127.18c-37.33-13.55-85.36-26.59-145.12-26.59c-153.35,0-261.27,81.52-262.18,198.25c-0.99,86.34,77.03,134.52,135.81,163.21  c60.47,29.38,80.76,48.26,80.53,74.54c-0.43,40.23-48.23,57.99-92.9,58.69c-77.98,1.2-123.23-21.1-159.3-37.87l-28.12,131.39  c36.25,16.63,103.16,31.14,172.53,31.87C1996.72,1348.96,2103.34,1268.45,2103.84,1143.77 M2508.78,1339.58h143.49l-125.25-599.74  h-132.44c-29.78,0-54.9,17.34-66.02,44l-232.81,555.74h162.91L2291,1250h199.05L2508.78,1339.58z M2335.67,1127.08l81.66-225.18  l47,225.18H2335.67z M1682.93,739.84l-128.29,599.74H1399.5l128.34-599.74H1682.93z" />
           </svg>
         )
       case 'mastercard':
         return (
           <svg width="16" height="10" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 131.39 86.9">
-            <rect fill="#ff5f00" x="48.37" y="15.14" width="34.66" height="56.61"/>
-            <path fill="#eb001b" d="M51.94,43.45a35.94,35.94,0,0,1,13.75-28.3,36,36,0,1,0,0,56.61A35.94,35.94,0,0,1,51.94,43.45Z"/>
-            <path fill="#f79e1b" d="M123.94,43.45a36,36,0,0,1-58.25,28.3,36,36,0,0,0,0-56.61,36,36,0,0,1,58.25,28.3Z"/>
+            <rect fill="#ff5f00" x="48.37" y="15.14" width="34.66" height="56.61" />
+            <path fill="#eb001b" d="M51.94,43.45a35.94,35.94,0,0,1,13.75-28.3,36,36,0,1,0,0,56.61A35.94,35.94,0,0,1,51.94,43.45Z" />
+            <path fill="#f79e1b" d="M123.94,43.45a36,36,0,0,1-58.25,28.3,36,36,0,0,0,0-56.61,36,36,0,0,1,58.25,28.3Z" />
           </svg>
         )
       case 'amex':
@@ -89,8 +89,11 @@ function BrandBadge({ brand }: { brand: string }) {
 }
 
 // Card type badge
-function CardTypeBadge({ type }: { type: string }) {
-  const getTypeColor = (type: string) => {
+function CardTypeBadge({ type }: { type: string | null | undefined }) {
+  const getTypeColor = (type: string | null | undefined) => {
+    if (!type) {
+      return 'bg-[#71717b]/10 text-[#e4e4e7] border-[#71717b]/20'
+    }
     switch (type.toLowerCase()) {
       case 'debit':
         return 'bg-purple-500/10 text-purple-400 border-purple-500/20'
@@ -105,7 +108,7 @@ function CardTypeBadge({ type }: { type: string }) {
 
   return (
     <span className={`px-2 py-1 text-xs font-medium rounded-lg border ${getTypeColor(type)}`}>
-      {type.toUpperCase()}
+      {type ? type.toUpperCase() : 'UNKNOWN'}
     </span>
   )
 }
@@ -122,23 +125,23 @@ export function PaymentMethodList({
 
   const handleCreatePurchaseIntent = async (paymentMethod: PaymentMethod) => {
     setCreatingIntentFor(paymentMethod.id)
-    
+
     try {
       const headers: HeadersInit = {
         'Content-Type': 'application/json'
       }
-      
+
       // Add JWT if provided (should have private role for purchase intent creation)
       if (jwt) {
         headers['Authorization'] = `Bearer ${jwt}`
       }
-      
+
       const response = await fetch('/api/purchase-intents', {
         method: 'POST',
         headers,
         body: JSON.stringify({
           paymentMethodId: paymentMethod.id,
-          credentialType: 'VISA_SRC',
+          credentialType: 'virtual-card',
           mandates: [
             {
               type: 'maxAmount',
@@ -154,6 +157,13 @@ export function PaymentMethodList({
               details: {
                 description: 'BasisTheory AI Demo'
               }
+            },
+            {
+              type: 'consumer',
+              value: '3d50aca6-9d1e-4459-8254-4171a92f5bd0',
+              details: {
+                email: 'lucas@basistheory.com'
+              }
             }
           ]
         })
@@ -167,7 +177,7 @@ export function PaymentMethodList({
 
       console.log('✅ Purchase intent created:', data)
       onPurchaseIntentCreated?.(data)
-      
+
     } catch (error) {
       console.error('❌ Failed to create purchase intent:', error)
       onError?.(error instanceof Error ? error.message : 'Failed to create purchase intent')
@@ -221,7 +231,7 @@ export function PaymentMethodList({
                   {String(method.card.details.expirationMonth).padStart(2, '0')}/{String(method.card.details.expirationYear).slice(-2)}
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-4 text-xs text-[#a1a1aa]">
                 <div className="flex items-center gap-1">
                   <span>ID:</span>
@@ -238,7 +248,7 @@ export function PaymentMethodList({
                   <span>{new Date(method.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
-              
+
               {/* Issuer info */}
               {method.card.display.issuerName && (
                 <div className="mt-1 text-xs text-[#a1a1aa]">

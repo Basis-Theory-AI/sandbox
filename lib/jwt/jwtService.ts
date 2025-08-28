@@ -17,14 +17,37 @@ export interface JWTClaims {
 /**
  * Generate a new JWT with the specified claims using RS256 (asymmetric key)
  */
+/**
+ * Clean and format the private key for PKCS8 import
+ */
+function formatPrivateKey(key: string): string {
+    // Remove any extra whitespace and ensure proper line breaks
+    return key
+        .replace(/\\n/g, '\n')  // Convert \n strings to actual newlines
+        .replace(/\s+/g, ' ')   // Normalize whitespace
+        .replace(/-----BEGIN PRIVATE KEY----- /g, '-----BEGIN PRIVATE KEY-----\n')
+        .replace(/ -----END PRIVATE KEY-----/g, '\n-----END PRIVATE KEY-----')
+        .replace(/-----BEGIN PRIVATE KEY-----\n([\s\S]+)\n-----END PRIVATE KEY-----/, (match, content) => {
+            // Split the content into 64-character lines
+            const cleanContent = content.replace(/\s/g, '');
+            const lines = [];
+            for (let i = 0; i < cleanContent.length; i += 64) {
+                lines.push(cleanContent.slice(i, i + 64));
+            }
+            return `-----BEGIN PRIVATE KEY-----\n${lines.join('\n')}\n-----END PRIVATE KEY-----`;
+        });
+}
+
 export async function generateJWT(
     userId: string,
     config: JWTConfig,
     roles: string[] = ['private']
 ): Promise<string> {
     try {
-        // Use private key for RS256 signing
-        const privateKey = await importPKCS8(config.secret, 'RS256')
+        // Clean and format the private key for RS256 signing
+        const formattedKey = formatPrivateKey(config.secret);
+        console.log('Formatted key preview:', formattedKey.substring(0, 100) + '...');
+        const privateKey = await importPKCS8(formattedKey, 'RS256')
 
         const jwt = await new SignJWT({
             sub: userId,

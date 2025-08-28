@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { 
-  BasisTheoryProvider, 
-  useBasisTheory
+import {
+  useBasisTheory,
+  BasisTheoryProvider
 } from '@basis-theory-ai/react'
 
-type VerificationState = 
+type VerificationState =
   | 'STARTING'           // Initial state
   | 'PROCESSING'         // Processing verification
   | 'SUCCESS'            // Verification complete
@@ -24,16 +24,17 @@ interface VerificationModalProps {
   onError: (error: string) => void
 }
 
-export function VerificationModal({ 
-  isOpen, 
-  onClose, 
-  intent, 
-  jwt, 
+export function VerificationModal({
+  isOpen,
+  onClose,
+  intent,
+  jwt,
   visaSession,
-  onSuccess, 
-  onError 
+  onSuccess,
+  onError
 }: VerificationModalProps) {
-  const { verifyPurchaseIntent } = useBasisTheory()
+  const basisTheoryHook = useBasisTheory()
+  const { verifyPurchaseIntent } = basisTheoryHook || { verifyPurchaseIntent: null }
   const [state, setState] = useState<VerificationState>('STARTING')
   const [error, setError] = useState<string | null>(null)
   const [progress, setProgress] = useState(0)
@@ -67,13 +68,13 @@ export function VerificationModal({
 
   const startVerification = async () => {
     console.log('🚀 Starting verification using SDK only...')
-    
+
     // Prevent double execution using ref
     if (verificationStartedRef.current) {
       console.log('⚠️ Verification already in progress (ref check), skipping duplicate call')
       return
     }
-    
+
     if (state !== 'STARTING') {
       console.log('⚠️ Verification already started (state check), skipping...', { currentState: state })
       return
@@ -95,16 +96,21 @@ export function VerificationModal({
 
       // Use ONLY the SDK method - no custom API calls
       console.log('🔄 Calling verifyPurchaseIntent from SDK...')
+
+      if (!verifyPurchaseIntent) {
+        throw new Error('BasisTheory SDK not properly initialized')
+      }
+
       const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || '00000000-0000-0000-0000-000000000000' // Fallback project ID
       const result = await verifyPurchaseIntent(projectId, intent.id)
-      
+
       console.log('✅ SDK verification result:', result)
       setProgress(100)
 
       // Check for successful verification - API returns status: 'SUCCESS' with purchaseIntentStatus
       if (result && (
-        result.status === 'SUCCESS' || 
-        result.status === 'VERIFIED' || 
+        result.status === 'SUCCESS' ||
+        result.status === 'VERIFIED' ||
         result.purchaseIntentStatus === 'active' ||
         result.purchaseIntentStatus === 'verified'
       )) {
@@ -127,7 +133,10 @@ export function VerificationModal({
 
   const handleClose = () => {
     if (state === 'PROCESSING' || state === 'STARTING') {
-      return
+      // If user closes during processing, treat it as cancellation
+      setState('ERROR')
+      setError('Verification cancelled by user')
+      onError('Verification cancelled by user')
     }
     // Reset the ref when closing
     verificationStartedRef.current = false
@@ -141,7 +150,7 @@ export function VerificationModal({
     setState('STARTING')
     setError(null)
     setProgress(0)
-    
+
     setTimeout(() => {
       startVerification()
     }, 10)
@@ -164,11 +173,11 @@ export function VerificationModal({
         brand: intent.brand,
         intentId: intent.id
       })
-      
+
       const timer = setTimeout(() => {
         startVerification()
       }, 100)
-      
+
       // Cleanup timer on unmount
       return () => clearTimeout(timer)
     }
@@ -209,7 +218,7 @@ export function VerificationModal({
             <span>{progress}% Complete</span>
           </div>
           <div className="w-full bg-white/10 rounded-full h-2">
-            <div 
+            <div
               className={`bg-gradient-to-r ${brandStyle.gradient} h-2 rounded-full transition-all duration-300`}
               style={{ width: `${progress}%` }}
             />
@@ -220,7 +229,7 @@ export function VerificationModal({
         <div className="text-center">
           {state === 'STARTING' && (
             <div className="space-y-4">
-              <div className="w-16 h-16 border-4 border-[#a1a1aa]/20 border-t-[#bff660] rounded-full animate-spin mx-auto"/>
+              <div className="w-16 h-16 border-4 border-[#a1a1aa]/20 border-t-[#bff660] rounded-full animate-spin mx-auto" />
               <div>
                 <h4 className="text-lg font-semibold text-[#f4f4f5] mb-2">Initializing Verification</h4>
                 <p className="text-[#a1a1aa] text-sm">Setting up secure authentication...</p>
@@ -230,7 +239,7 @@ export function VerificationModal({
 
           {state === 'PROCESSING' && (
             <div className="space-y-4">
-              <div className="w-16 h-16 border-4 border-[#a1a1aa]/20 border-t-[#bff660] rounded-full animate-spin mx-auto"/>
+              <div className="w-16 h-16 border-4 border-[#a1a1aa]/20 border-t-[#bff660] rounded-full animate-spin mx-auto" />
               <div>
                 <h4 className="text-lg font-semibold text-[#f4f4f5] mb-2">Verifying Payment</h4>
                 <p className="text-[#a1a1aa] text-sm">Please wait while we verify your payment method...</p>
