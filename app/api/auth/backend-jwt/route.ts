@@ -33,15 +33,31 @@ export async function GET() {
             claims
         }
 
-        return NextResponse.json(response)
+        const nextResponse = NextResponse.json(response)
+        
+        // Prevent caching by Vercel and browsers
+        nextResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+        nextResponse.headers.set('Pragma', 'no-cache')
+        nextResponse.headers.set('Expires', '0')
+        nextResponse.headers.set('Surrogate-Control', 'no-store')
+        
+        return nextResponse
     } catch (error) {
         console.error('❌ Backend JWT fetch error:', error)
-        return NextResponse.json(
+        const errorResponse = NextResponse.json(
             {
                 error: 'Backend JWT fetch failed',
                 message: error instanceof Error ? error.message : 'Unknown error'
             },
             { status: 500 }
         )
+        
+        // Prevent caching error responses too
+        errorResponse.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+        errorResponse.headers.set('Pragma', 'no-cache')
+        errorResponse.headers.set('Expires', '0')
+        errorResponse.headers.set('Surrogate-Control', 'no-store')
+        
+        return errorResponse
     }
 } 
