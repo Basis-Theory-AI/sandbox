@@ -27,7 +27,7 @@ const DEFAULT_MANDATES = [
   },
   {
     type: "expirationTime",
-    value: "1735690745"
+    value: "1767182340"
   },
   {
     type: "prompt",
@@ -37,7 +37,17 @@ const DEFAULT_MANDATES = [
     type: "consumer",
     value: "3d50aca6-9d1e-4459-8254-4171a92f5bd0",
     details: {
-      email: "lucas@basistheory.com"
+      name: "Lucas Chociay",
+      email: "lucas@basistheory.com",
+      address: {
+        line1: "123 Main Street",
+        line2: "Apt 4B", 
+        line3: "Building 7",
+        city: "Beverly Hills",
+        postalCode: "90210",
+        stateCode: "CA",
+        countryCode: "USA"
+      }
     }
   }
 ]
@@ -71,17 +81,47 @@ export async function POST(request: NextRequest) {
       jwt = await generateJWT(defaultUserId, config, ['private'])
     }
 
+    // First, fetch payment method details to determine credential type
+    console.log('📋 Fetching payment method details:', paymentMethodId.slice(-8))
+    
+    const paymentMethodResponse = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/payment-methods/${paymentMethodId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${jwt}`
+      }
+    })
+
+    if (!paymentMethodResponse.ok) {
+      const errorData = await paymentMethodResponse.json()
+      console.error('❌ Failed to fetch payment method:', errorData)
+      return NextResponse.json(
+        { error: errorData.error || 'Failed to fetch payment method details' },
+        { status: paymentMethodResponse.status }
+      )
+    }
+
+    const paymentMethodData = await paymentMethodResponse.json()
+    
+    // Determine credential type based on card brand
+    // AMEX and Discover use network-token, Visa and Mastercard use virtual-card
+    const cardBrand = paymentMethodData.card?.brand?.toLowerCase()
+    const credentialType = (cardBrand === 'amex' || cardBrand === 'american-express' || cardBrand === 'discover') 
+      ? 'network-token' 
+      : 'virtual-card'
+
     // Prepare purchase intent data with default mandates
     const purchaseIntentData = {
       entityId: defaultUserId,
       paymentMethodId: paymentMethodId,
-      credentialType: "virtual-card",
+      credentialType,
       mandates: DEFAULT_MANDATES
     }
 
     console.log('🚀 Creating purchase intent:', { 
       paymentMethodId: paymentMethodId.slice(-8),
       entityId: defaultUserId,
+      cardBrand,
+      credentialType,
       mandatesCount: DEFAULT_MANDATES.length
     })
 
@@ -98,7 +138,7 @@ export async function POST(request: NextRequest) {
     const responseData = await response.json()
 
     if (!response.ok) {
-      console.error('❌ Purchase intent creation failed:', responseData)
+      console.error('❌ Purchase intent creation failed:', JSON.stringify(responseData, null, 2))
       return NextResponse.json(
         { error: responseData.error || 'Failed to create purchase intent' },
         { status: response.status }

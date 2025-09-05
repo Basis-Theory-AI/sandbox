@@ -5,11 +5,11 @@ import {
   BasisTheoryProvider, 
   useBasisTheory
 } from '@basis-theory-ai/react'
-import { useJWT } from '../src/hooks/useJWT'
-import { JWTStatus } from '../src/components/JWTStatus'
-import { PaymentMethodCreator } from '../src/components/PaymentMethodCreator'
-import { PaymentMethodList } from '../src/components/PaymentMethodList'
-import { PurchaseIntentList } from '../src/components/PurchaseIntentList'
+import { useJWT } from './hooks/useJWT'
+import { JWTStatus } from './components/JWTStatus'
+import { PaymentMethodCreator } from './components/PaymentMethodCreator'
+import { PaymentMethodList } from './components/PaymentMethodList'
+import { PurchaseIntentList } from './components/PurchaseIntentList'
 
 // BasisTheory Logo Component
 function BasisTheoryLogo({ className = "w-32 h-auto" }: { className?: string }) {
@@ -282,8 +282,14 @@ function PaymentMethodModal({ isOpen, onClose, onPaymentMethodCreated, onError, 
 }
 
 function AppContent({ jwt }: { jwt: string }) {
-  const { getVisaStatus } = useBasisTheory()
+  const { 
+    getVisaStatus, 
+    getMastercardStatus,
+    isMastercardReady,
+    mastercardError
+  } = useBasisTheory()
   const visaStatus = getVisaStatus()
+  const mastercardStatus = getMastercardStatus()
   
   const [paymentMethods, setPaymentMethods] = useState([])
   const [purchaseIntents, setPurchaseIntents] = useState([])
@@ -582,6 +588,9 @@ function AppContent({ jwt }: { jwt: string }) {
               jwt={privateJWT || jwt}
               visaSession={visaStatus.session}
               visaReady={visaStatus.isReady}
+              mastercardStatus={mastercardStatus}
+              mastercardReady={isMastercardReady}
+              mastercardError={mastercardError}
             />
           </div>
         )}
@@ -608,7 +617,10 @@ function BasisTheoryDemo({ jwt }: { jwt: string }) {
         getVisaStatus,
         isVisaReady,
         visaSession,
-        visaError 
+        visaError,
+        getMastercardStatus,
+        isMastercardReady,
+        mastercardError
     } = useBasisTheory()
 
     // Get Visa status from hook
@@ -714,7 +726,16 @@ export default function Home() {
     }
 
     return (
-        <BasisTheoryProvider apiKey={jwt}>
+        <BasisTheoryProvider 
+            apiKey={jwt} 
+            environment="local"
+            visa={{
+                apiKey: process.env.NEXT_PUBLIC_VISA_API_KEY || '',
+                clientAppId: process.env.NEXT_PUBLIC_VISA_CLIENT_APP_ID || '',
+                clientName: 'BasisTheory React SDK Demo'
+            }}
+            // Mastercard is initialized automatically from VITE_ env vars at build time
+        >
             <BasisTheoryDemo jwt={jwt} />
         </BasisTheoryProvider>
     )

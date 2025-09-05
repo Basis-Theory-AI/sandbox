@@ -42,8 +42,8 @@ function BrandBadge({ brand }: { brand: string }) {
       case 'mastercard':
         return 'bg-red-500/10 text-red-400 border-red-500/20'
       case 'amex':
-      case 'american express':
-        return 'bg-green-500/10 text-green-400 border-green-500/20'
+      case 'american-express':
+        return 'bg-sky-500/10 text-sky-400 border-sky-500/20'
       case 'discover':
         return 'bg-orange-500/10 text-orange-400 border-orange-500/20'
       default:
@@ -69,10 +69,25 @@ function BrandBadge({ brand }: { brand: string }) {
           </svg>
         )
       case 'amex':
-      case 'american express':
-        return '💎'
+      case 'american-express':
+        return (
+          <svg width="16" height="16" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+            <polygon fill="#FFFFFF" points="15,16 15,40.9219055 15,66 39.9992676,66 64.9999847,66 64.9999847,41.0007019 64.9999847,16 40.0089722,16 15,16"/>
+            <path fill="#006FCF" d="M56.0832977,28.2666931l1.5999908-4.3500061h7.3166962V16H15v50h49.9999847v-7.8999939h-6.9000092 l-2.5499725-2.9833069l-2.6500244,2.9833069H33.2999878V42.2167053h-6.4667053L34.916687,23.916687h7.8665771l1.9000244,4.1499939 V23.916687h9.7667084L56.0832977,28.2666931L56.0832977,28.2666931z M50.5666962,31.1500244l-0.0167084-1.7500305 l0.6667175,1.7500305l3.2499847,8.6832886h3.2332916l3.2667084-8.6832886l0.6332855-1.7333374v10.416626h3.4000092V26.5 h-5.6500092l-2.5666962,6.7667236l-0.6832886,1.8332825l-0.6999969-1.8332825L52.8166962,26.5H47.166687v13.333313h3.4000092 V31.1500244L50.5666962,31.1500244z M43.25,39.833313h3.916687L41.2999878,26.5H36.75l-5.9000244,13.333313h3.8667297 L35.75,37.2666931h6.4667053L43.25,39.833313L43.25,39.833313z M38.3167114,31.0167236l0.6665649-1.6667175l0.6667175,1.6667175 l1.3833008,3.3665771h-4.1000061L38.3167114,31.0167236L38.3167114,31.0167236z M36.0332642,42.2332764v13.2834167H47.166687 v-2.8833923h-7.7333984v-2.3165894h7.5834045v-2.8666992h-7.5834045v-2.333313h7.7333984v-2.8834229H36.0332642 L36.0332642,42.2332764z M59.5499878,55.5166931h4.4167175l-6.2334137-6.6667175l6.2334137-6.6166992h-4.3500061 l-4.0167236,4.3167419l-3.9999847-4.3167419H47.166687l6.2165985,6.6667175l-6.2165985,6.6166992h4.3000031l4.0500031-4.333374 L59.5499878,55.5166931L59.5499878,55.5166931z M61.2332916,48.833313l3.7666931,3.833374v-7.6166687L61.2332916,48.833313 L61.2332916,48.833313z"/>
+          </svg>
+        )
       case 'discover':
-        return '🟠'
+        return (
+          <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0,0,256,256" fill-rule="nonzero">
+            <g fill="none" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0" font-family="none" font-weight="none" font-size="none" text-anchor="none">
+              <g transform="scale(5.33333,5.33333)">
+                <path d="M45,35c0,2.2 -1.8,4 -4,4h-34c-2.2,0 -4,-1.8 -4,-4v-22c0,-2.2 1.8,-4 4,-4h34c2.2,0 4,1.8 4,4z" fill="#ffffff"></path>
+                <path d="M45,35c0,2.2 -1.8,4 -4,4h-25c0,0 23.6,-3.8 29,-15zM22,24c0,1.7 1.3,3 3,3c1.7,0 3,-1.3 3,-3c0,-1.7 -1.3,-3 -3,-3c-1.7,0 -3,1.3 -3,3z" fill="#ff6d00"></path>
+                <path d="M11.2,21h1.1v6h-1.1zM17.2,24c0,1.7 1.3,3 3,3c0.5,0 0.9,-0.1 1.4,-0.3v-1.3c-0.4,0.4 -0.8,0.6 -1.4,0.6c-1.1,0 -1.9,-0.8 -1.9,-2c0,-1.1 0.8,-2 1.9,-2c0.5,0 0.9,0.2 1.4,0.6v-1.3c-0.5,-0.2 -0.9,-0.4 -1.4,-0.4c-1.7,0.1 -3,1.5 -3,3.1zM30.6,24.9l-1.6,-3.9h-1.2l2.5,6h0.6l2.5,-6h-1.2zM33.9,27h3.2v-1h-2.1v-1.6h2v-1h-2v-1.4h2.1v-1h-3.2zM41.5,22.8c0,-1.1 -0.7,-1.8 -2,-1.8h-1.7v6h1.1v-2.4h0.1l1.6,2.4h1.4l-1.8,-2.5c0.8,-0.2 1.3,-0.8 1.3,-1.7zM39.2,23.8h-0.3v-1.8h0.3c0.7,0 1.1,0.3 1.1,0.9c0,0.5 -0.3,0.9 -1.1,0.9zM7.7,21h-1.7v6h1.6c2.5,0 3.1,-2.1 3.1,-3c0.1,-1.8 -1.2,-3 -3,-3zM7.4,26h-0.3v-4h0.4c1.5,0 2.1,1 2.1,2c0,0.4 -0.1,2 -2.2,2zM15.3,23.3c-0.7,-0.3 -0.9,-0.4 -0.9,-0.7c0,-0.4 0.4,-0.6 0.8,-0.6c0.3,0 0.6,0.1 0.9,0.5l0.6,-0.8c-0.5,-0.5 -1,-0.7 -1.7,-0.7c-1,0 -1.8,0.7 -1.8,1.7c0,0.8 0.4,1.2 1.4,1.6c0.6,0.2 1.1,0.4 1.1,0.9c0,0.5 -0.4,0.8 -0.9,0.8c-0.5,0 -1,-0.3 -1.2,-0.8l-0.7,0.7c0.5,0.8 1.1,1.1 2,1.1c1.2,0 2,-0.8 2,-1.9c0,-0.9 -0.4,-1.3 -1.6,-1.8z" fill="#000000"></path>
+              </g>
+            </g>
+          </svg>
+        )
       default:
         return '💳'
     }
@@ -91,7 +106,7 @@ function BrandBadge({ brand }: { brand: string }) {
 // Card type badge
 function CardTypeBadge({ type }: { type: string }) {
   const getTypeColor = (type: string) => {
-    switch (type.toLowerCase()) {
+    switch (type?.toLowerCase() ?? 'credit') {
       case 'debit':
         return 'bg-purple-500/10 text-purple-400 border-purple-500/20'
       case 'credit':
@@ -105,7 +120,7 @@ function CardTypeBadge({ type }: { type: string }) {
 
   return (
     <span className={`px-2 py-1 text-xs font-medium rounded-lg border ${getTypeColor(type)}`}>
-      {type.toUpperCase()}
+      {type?.toUpperCase() ?? 'CREDIT'}
     </span>
   )
 }
@@ -138,7 +153,7 @@ export function PaymentMethodList({
         headers,
         body: JSON.stringify({
           paymentMethodId: paymentMethod.id,
-          credentialType: 'VISA_SRC',
+          // credentialType will be determined automatically by the API based on card brand
           mandates: [
             {
               type: 'maxAmount',
