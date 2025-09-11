@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { VerificationModal } from "../payment-methods/VerificationModal";
-import { CardDetailsModal } from "../CardDetailsModal";
+import { CardDetailsModal } from "./CardDetailsModal";
 
 interface PaymentMethod {
   id: string;

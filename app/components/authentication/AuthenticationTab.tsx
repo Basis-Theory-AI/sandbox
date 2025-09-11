@@ -1,92 +1,80 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { JWTService } from "../../services/jwtService";
+import { JWTDisplayCard } from "./JWTDisplayCard";
 
 interface AuthenticationTabProps {
-  defaultJWT: string;
-  onJWTUpdate?: (publicJWT: string, privateJWT: string) => void;
+  onJWTsChanged: (publicJWT: string, privateJWT: string) => void;
 }
 
-export function AuthenticationTab({
-  defaultJWT,
-  onJWTUpdate,
-}: AuthenticationTabProps) {
-  const [frontendJWT, setFrontendJWT] = useState(defaultJWT);
-  const [backendJWT, setBackendJWT] = useState("");
+export function AuthenticationTab({ onJWTsChanged }: AuthenticationTabProps) {
   const [entityId, setEntityId] = useState("user123");
-  const [isCreatingFrontend, setIsCreatingFrontend] = useState(false);
-  const [isCreatingBackend, setIsCreatingBackend] = useState(false);
-  const [copiedFrontend, setCopiedFrontend] = useState(false);
-  const [copiedBackend, setCopiedBackend] = useState(false);
-  const [isLoadingBackendJWT, setIsLoadingBackendJWT] = useState(true);
+  const [publicJWT, setPublicJWT] = useState("");
+  const [privateJWT, setPrivateJWT] = useState("");
+  const [isCreatingPublic, setIsCreatingPublic] = useState(false);
+  const [isCreatingPrivate, setIsCreatingPrivate] = useState(false);
+  const [copiedPublic, setCopiedPublic] = useState(false);
+  const [copiedPrivate, setCopiedPrivate] = useState(false);
 
-  // Initialize with default JWTs
+  // auto-generate JWTs on mount
   useEffect(() => {
-    setFrontendJWT(defaultJWT);
-  }, [defaultJWT]);
-
-  // Fetch the existing backend JWT
-  useEffect(() => {
-    const fetchBackendJWT = async () => {
+    const initializeJWTs = async () => {
       try {
-        const jwt = await JWTService.getBackendJWT();
-        setBackendJWT(jwt);
-        // Notify parent when backend JWT is loaded
-        if (onJWTUpdate && frontendJWT) {
-          onJWTUpdate(frontendJWT, jwt);
-        }
+        const [publicToken, privateToken] = await Promise.all([
+          JWTService.generateJWT(entityId, "public"),
+          JWTService.generateJWT(entityId, "private"),
+        ]);
+
+        setPublicJWT(publicToken);
+        setPrivateJWT(privateToken);
+        onJWTsChanged(publicToken, privateToken);
       } catch (error) {
-        // Error handling - could show toast notification
-      } finally {
-        setIsLoadingBackendJWT(false);
+        console.error("Failed to initialize JWTs:", error);
       }
     };
 
-    fetchBackendJWT();
+    initializeJWTs();
   }, []);
 
-  const createJWT = async (roles: string[], isBackend = false) => {
-    const setter = isBackend ? setIsCreatingBackend : setIsCreatingFrontend;
+  const generateJWT = async (role: "public" | "private") => {
+    const setter =
+      role === "public" ? setIsCreatingPublic : setIsCreatingPrivate;
     setter(true);
 
     try {
-      let jwt: string;
-      
-      if (isBackend) {
-        jwt = await JWTService.getBackendJWT();
-        setBackendJWT(jwt);
-        // Notify parent of JWT updates (backend JWT has private role)
-        if (onJWTUpdate && frontendJWT) {
-          onJWTUpdate(frontendJWT, jwt);
-        }
+      const jwt = await JWTService.generateJWT(entityId, role);
+
+      if (role === "public") {
+        setPublicJWT(jwt);
+        onJWTsChanged(jwt, privateJWT);
+      } else if (role === "private") {
+        setPrivateJWT(jwt);
+        onJWTsChanged(publicJWT, jwt);
       } else {
-        jwt = await JWTService.createJWT({
-          userId: entityId,
-          roles: roles,
-        });
-        setFrontendJWT(jwt);
-        // Notify parent of JWT updates (frontend JWT has public role)
-        if (onJWTUpdate && backendJWT) {
-          onJWTUpdate(jwt, backendJWT);
-        }
+        throw new Error(`Invalid role: ${role}`);
       }
     } catch (error) {
-      // Error handling - could show toast notification
+      console.error(`Failed to generate ${role} JWT:`, error);
     } finally {
       setter(false);
     }
   };
 
-  const handleCopy = async (jwt: string, isBackend = false) => {
-    await JWTService.copyToClipboard(jwt);
-    if (isBackend) {
-      setCopiedBackend(true);
-      setTimeout(() => setCopiedBackend(false), 2000);
-    } else {
-      setCopiedFrontend(true);
-      setTimeout(() => setCopiedFrontend(false), 2000);
-    }
+  // Handlers for JWT cards
+  const handlePublicGenerate = () => generateJWT("public");
+  const handlePrivateGenerate = () => generateJWT("private");
+
+  const handlePublicCopy = async () => {
+    await JWTService.copyToClipboard(publicJWT);
+    setCopiedPublic(true);
+    setTimeout(() => setCopiedPublic(false), 2000);
+  };
+
+  const handlePrivateCopy = async () => {
+    await JWTService.copyToClipboard(privateJWT);
+    setCopiedPrivate(true);
+    setTimeout(() => setCopiedPrivate(false), 2000);
   };
 
   return (
@@ -112,98 +100,29 @@ export function AuthenticationTab({
         </div>
       </div>
 
-      {/* Frontend JWT */}
-      <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <h3 className="text-sm font-semibold text-[#f4f4f5]">
-              Frontend JWT (Public Role)
-            </h3>
-            <p className="text-xs text-[#a1a1aa]">
-              Used by React SDK and to Create Payment Methods
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => createJWT(["public"])}
-              disabled={isCreatingFrontend}
-              className="px-3 py-1.5 bg-[#bff660] text-[#131316] text-xs font-medium rounded-lg hover:bg-[#b2f63d] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
-            >
-              {isCreatingFrontend ? "Creating..." : "Create New"}
-            </button>
-            <button
-              onClick={() => handleCopy(frontendJWT)}
-              className="px-3 py-1.5 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 hover:-translate-y-0.5"
-            >
-              {copiedFrontend ? "✓ Copied!" : "Copy"}
-            </button>
-          </div>
-        </div>
-        {frontendJWT && (
-          <>
-            <div className="bg-black/30 rounded-lg p-3 font-mono text-xs text-[#bff660] overflow-hidden mb-3">
-              <div className="break-all">{frontendJWT}</div>
-            </div>
-            <div className="bg-black/30 rounded-lg p-3 font-mono text-xs text-[#a1a1aa] max-h-32 overflow-y-auto">
-              <pre className="whitespace-pre-wrap">
-                {JSON.stringify(JWTService.decodeJWT(frontendJWT), null, 2)}
-              </pre>
-            </div>
-          </>
-        )}
-      </div>
+      {/* Frontend JWT (Public Role) */}
+      <JWTDisplayCard
+        title="Frontend JWT (Public Role)"
+        description="Used by React SDK and to Create Payment Methods"
+        role="public"
+        jwt={publicJWT}
+        isCreating={isCreatingPublic}
+        copied={copiedPublic}
+        onGenerate={handlePublicGenerate}
+        onCopy={handlePublicCopy}
+      />
 
-      {/* Backend JWT */}
-      <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-4">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <h3 className="text-sm font-semibold text-[#f4f4f5]">
-              Backend JWT (Private Role)
-            </h3>
-            <p className="text-xs text-[#a1a1aa]">
-              Used to Create/Fetch Purchase Intents and Fetch Payment Methods
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => createJWT(["private"], true)}
-              disabled={isCreatingBackend}
-              className="px-3 py-1.5 bg-[#bff660] text-[#131316] text-xs font-medium rounded-lg hover:bg-[#b2f63d] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
-            >
-              {isCreatingBackend ? "Refreshing..." : "Refresh"}
-            </button>
-            {backendJWT && (
-              <button
-                onClick={() => handleCopy(backendJWT, true)}
-                className="px-3 py-1.5 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 hover:-translate-y-0.5"
-              >
-                {copiedBackend ? "✓ Copied!" : "Copy"}
-              </button>
-            )}
-          </div>
-        </div>
-        {isLoadingBackendJWT ? (
-          <div className="bg-black/30 rounded-lg p-3 text-xs text-[#a1a1aa] text-center flex items-center justify-center gap-2">
-            <div className="w-3 h-3 border border-[#a1a1aa] border-t-[#bff660] rounded-full animate-spin"></div>
-            Loading backend JWT...
-          </div>
-        ) : backendJWT ? (
-          <>
-            <div className="bg-black/30 rounded-lg p-3 font-mono text-xs text-[#bff660] overflow-hidden mb-3">
-              <div className="break-all">{backendJWT}</div>
-            </div>
-            <div className="bg-black/30 rounded-lg p-3 font-mono text-xs text-[#a1a1aa] max-h-32 overflow-y-auto">
-              <pre className="whitespace-pre-wrap">
-                {JSON.stringify(JWTService.decodeJWT(backendJWT), null, 2)}
-              </pre>
-            </div>
-          </>
-        ) : (
-          <div className="bg-black/30 rounded-lg p-3 text-xs text-[#a1a1aa] text-center">
-            Failed to load backend JWT
-          </div>
-        )}
-      </div>
+      {/* Backend JWT (Private Role) */}
+      <JWTDisplayCard
+        title="Backend JWT (Private Role)"
+        description="Used to Create/Read Purchase Intents and Read Payment Methods"
+        role="private"
+        jwt={privateJWT}
+        isCreating={isCreatingPrivate}
+        copied={copiedPrivate}
+        onGenerate={handlePrivateGenerate}
+        onCopy={handlePrivateCopy}
+      />
     </div>
   );
 }

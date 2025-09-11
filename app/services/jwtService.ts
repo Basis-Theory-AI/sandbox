@@ -1,44 +1,21 @@
-export interface JWTCreateRequest {
-  userId: string;
-  roles: string[];
-}
-
-export interface JWTResponse {
-  jwt: string;
-}
-
 /**
  * Service for handling JWT operations
  */
 export class JWTService {
   /**
-   * Create a new JWT token
+   * Generate a new JWT token for specific user and role
    */
-  static async createJWT(request: JWTCreateRequest): Promise<string> {
-    const response = await fetch("/api/auth/jwt", {
+  static async generateJWT(entityId: string, role: 'public' | 'private'): Promise<string> {
+    const response = await fetch("/api/auth/generate-jwt", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(request),
+      body: JSON.stringify({ entityId, role }),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || "Failed to create JWT");
-    }
-
-    return data.jwt;
-  }
-
-  /**
-   * Get the backend JWT (private role)
-   */
-  static async getBackendJWT(): Promise<string> {
-    const response = await fetch("/api/auth/backend-jwt");
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "Failed to fetch backend JWT");
+      throw new Error(data.error || "Failed to generate JWT");
     }
 
     return data.jwt;

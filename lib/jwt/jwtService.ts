@@ -18,7 +18,7 @@ export interface JWTClaims {
  * Generate a new JWT with the specified claims using RS256 (asymmetric key)
  */
 export async function generateJWT(
-    userId: string,
+    entityId: string,
     config: JWTConfig,
     roles: string[] = ['private']
 ): Promise<string> {
@@ -27,7 +27,7 @@ export async function generateJWT(
         const privateKey = await importPKCS8(config.secret, 'RS256')
 
         const jwt = await new SignJWT({
-            sub: userId,
+            sub: entityId,
             iss: config.projectId,
             roles: roles,
         })
