@@ -22,7 +22,7 @@ export function usePaymentMethods(jwt: string | null) {
     }
   };
 
-  // Auto-fetch when jwt changes
+  // auto-fetch when jwt changes
   useEffect(() => {
     if (jwt) {
       fetchPaymentMethods();

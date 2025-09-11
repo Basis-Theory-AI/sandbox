@@ -1,17 +1,20 @@
 "use client";
 
 import React, { useState } from "react";
-import { useBasisTheory } from "@basis-theory-ai/react";
-import { BasisTheoryLogo } from "./shared/BasisTheoryLogo";
+import { useBtAi } from "@basis-theory-ai/react";
+import { BtAiLogo } from "./shared/BtAiLogo";
 import { AuthenticationTab } from "./authentication/AuthenticationTab";
-import { PaymentMethodModal } from "./payment-methods/PaymentMethodModal";
-import { PaymentMethodList } from "./payment-methods/PaymentMethodList";
-import { PurchaseIntentList } from "./purchase-intents/PurchaseIntentList";
+import { PaymentMethodsTab } from "./payment-methods/PaymentMethodsTab";
+import { PurchaseIntentsTab } from "./purchase-intents/PurchaseIntentsTab";
 import { usePaymentMethods } from "../hooks/usePaymentMethods";
 import { usePurchaseIntents } from "../hooks/usePurchaseIntents";
 
-export function Playground() {
-  const { getStatus } = useBasisTheory();
+interface PlaygroundProps {
+  initialJWT: string;
+}
+
+export function Playground({ initialJWT }: PlaygroundProps) {
+  const { getStatus, updateJwt } = useBtAi();
   const visaStatus = getStatus().visa;
   const mastercardStatus = getStatus().mastercard;
 
@@ -20,29 +23,22 @@ export function Playground() {
   const [activeTab, setActiveTab] = useState<
     "authentication" | "payment-methods" | "purchase-intents"
   >("authentication");
-  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
   // Simple JWT state management
-  const [publicJWT, setPublicJWT] = useState(""); // For payment method creation
+  const [publicJWT, setPublicJWT] = useState(initialJWT); // For payment method creation
   const [privateJWT, setPrivateJWT] = useState(""); // For data fetching
 
-  // Use custom hooks for data management
+  // Use custom hooks for data management (still needed for purchase intents tab)
   const paymentMethodsHook = usePaymentMethods(privateJWT);
   const purchaseIntentsHook = usePurchaseIntents(privateJWT);
 
   const handleJWTsChanged = (publicToken: string, privateToken: string) => {
     setPublicJWT(publicToken);
     setPrivateJWT(privateToken);
+    updateJwt(publicToken); // update the JWT in the SDK provider
   };
 
   // Handle success messages
-  const handlePaymentMethodCreated = (newPaymentMethod: any) => {
-    setSuccessMessage("Payment Method Created Successfully!");
-    setError(null);
-    paymentMethodsHook.refresh();
-    setTimeout(() => setSuccessMessage(null), 5000);
-  };
-
   const handlePurchaseIntentCreated = (newPurchaseIntent: any) => {
     setSuccessMessage("Purchase Intent Created Successfully!");
     setError(null);
@@ -84,7 +80,7 @@ export function Playground() {
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <BasisTheoryLogo className="w-28 h-auto" />
+              <BtAiLogo className="w-28 h-auto" />
             </div>
 
             {/* Status Indicators */}
@@ -171,89 +167,24 @@ export function Playground() {
         )}
 
         {activeTab === "payment-methods" && (
-          <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-[#f4f4f5]">
-                Payment Methods
-              </h2>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setPaymentModalOpen(true)}
-                  disabled={!publicJWT}
-                  className="px-4 py-2 bg-[#bff660] text-[#131316] text-sm font-medium rounded-lg hover:bg-[#b2f63d] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Create Payment Method
-                </button>
-                <button
-                  onClick={paymentMethodsHook.refresh}
-                  disabled={!privateJWT}
-                  className="px-3 py-1.5 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Refresh
-                </button>
-              </div>
-            </div>
-            {!privateJWT ? (
-              <div className="text-center py-8 text-[#a1a1aa]">
-                <p className="mb-2">🔑 Generate JWTs in the Authentication tab first</p>
-                <p className="text-sm">Private JWT is needed to fetch payment methods</p>
-              </div>
-            ) : (
-              <PaymentMethodList
-                paymentMethods={paymentMethodsHook.paymentMethods}
-                onRefresh={paymentMethodsHook.refresh}
-                loading={paymentMethodsHook.loading}
-                onPurchaseIntentCreated={handlePurchaseIntentCreated}
-                onError={handleError}
-                jwt={privateJWT}
-              />
-            )}
-          </div>
+          <PaymentMethodsTab
+            publicJWT={publicJWT}
+            privateJWT={privateJWT}
+            onPurchaseIntentCreated={handlePurchaseIntentCreated}
+            onError={handleError}
+          />
         )}
 
         {activeTab === "purchase-intents" && (
-          <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-[#f4f4f5]">
-                Purchase Intents
-              </h2>
-              <button
-                onClick={purchaseIntentsHook.refresh}
-                disabled={!privateJWT}
-                className="px-3 py-1.5 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Refresh
-              </button>
-            </div>
-            {!privateJWT ? (
-              <div className="text-center py-8 text-[#a1a1aa]">
-                <p className="mb-2">🔑 Generate JWTs in the Authentication tab first</p>
-                <p className="text-sm">Private JWT is needed to fetch purchase intents</p>
-              </div>
-            ) : (
-              <PurchaseIntentList
-                purchaseIntents={purchaseIntentsHook.purchaseIntents}
-                paymentMethods={paymentMethodsHook.paymentMethods}
-                onRefresh={purchaseIntentsHook.refresh}
-                loading={purchaseIntentsHook.loading}
-                onVerificationStarted={handleVerificationStarted}
-                onVerificationCompleted={handleVerificationCompleted}
-                onError={handleError}
-                jwt={privateJWT}
-              />
-            )}
-          </div>
+          <PurchaseIntentsTab
+            privateJWT={privateJWT}
+            paymentMethods={paymentMethodsHook.paymentMethods}
+            onVerificationStarted={handleVerificationStarted}
+            onVerificationCompleted={handleVerificationCompleted}
+            onError={handleError}
+          />
         )}
       </div>
-
-      {/* Payment Method Modal */}
-      <PaymentMethodModal
-        isOpen={paymentModalOpen}
-        onClose={() => setPaymentModalOpen(false)}
-        onPaymentMethodCreated={handlePaymentMethodCreated}
-        onError={handleError}
-        jwt={publicJWT}
-      />
     </div>
   );
 }

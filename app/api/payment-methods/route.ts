@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateJWT, getJWTConfig } from '../../../lib/jwt/jwtService'
-
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000'
-const PROJECT_ID = process.env.JWT_PROJECT_ID
+import { BackendAPIService } from '../../services/backendApiService'
 
 // POST - Create Payment Method (requires public role)
 export async function POST(request: NextRequest) {
@@ -49,25 +47,8 @@ export async function POST(request: NextRequest) {
       expirationYear: paymentMethodData.card.expirationYear
     })
 
-    // Call main API
-    const response = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/payment-methods`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${jwt}`
-      },
-      body: JSON.stringify(paymentMethodData)
-    })
-
-    const responseData = await response.json()
-
-    if (!response.ok) {
-      console.error('❌ Payment method creation failed:', responseData)
-      return NextResponse.json(
-        { error: responseData.error || 'Failed to create payment method' },
-        { status: response.status }
-      )
-    }
+    // Call main API using service
+    const responseData = await BackendAPIService.createPaymentMethod(jwt, paymentMethodData)
 
     console.log('✅ Payment method created successfully:', {
       id: responseData.id,
@@ -102,25 +83,10 @@ export async function GET(request: NextRequest) {
       jwt = await generateJWT(defaultUserId, config, ['private'])
     }
 
-    console.log('📋 Fetching payment methods for project:', PROJECT_ID)
+    console.log('📋 Fetching payment methods')
 
-    // Call main API
-    const response = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/payment-methods`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${jwt}`
-      }
-    })
-
-    const responseData = await response.json()
-
-    if (!response.ok) {
-      console.error('❌ Failed to fetch payment methods:', responseData)
-      return NextResponse.json(
-        { error: responseData.error || 'Failed to fetch payment methods' },
-        { status: response.status }
-      )
-    }
+    // Call main API using service
+    const responseData = await BackendAPIService.fetchPaymentMethods(jwt)
 
     console.log('✅ Payment methods fetched successfully:', {
       count: responseData.length || 0

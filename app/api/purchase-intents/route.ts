@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateJWT, getJWTConfig } from '../../../lib/jwt/jwtService'
-
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000'
-const PROJECT_ID = process.env.JWT_PROJECT_ID
+import { BackendAPIService } from '../../services/backendApiService'
 
 // Default mandates configuration
 const DEFAULT_MANDATES = [
@@ -84,23 +82,7 @@ export async function POST(request: NextRequest) {
     // First, fetch payment method details to determine credential type
     console.log('📋 Fetching payment method details:', paymentMethodId.slice(-8))
     
-    const paymentMethodResponse = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/payment-methods/${paymentMethodId}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${jwt}`
-      }
-    })
-
-    if (!paymentMethodResponse.ok) {
-      const errorData = await paymentMethodResponse.json()
-      console.error('❌ Failed to fetch payment method:', errorData)
-      return NextResponse.json(
-        { error: errorData.error || 'Failed to fetch payment method details' },
-        { status: paymentMethodResponse.status }
-      )
-    }
-
-    const paymentMethodData = await paymentMethodResponse.json()
+    const paymentMethodData = await BackendAPIService.fetchPaymentMethod(jwt, paymentMethodId)
     
     // Determine credential type based on card brand
     // AMEX and Discover use network-token, Visa and Mastercard use virtual-card
@@ -125,25 +107,8 @@ export async function POST(request: NextRequest) {
       mandatesCount: DEFAULT_MANDATES.length
     })
 
-    // Call main API
-    const response = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/purchase-intents`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${jwt}`
-      },
-      body: JSON.stringify(purchaseIntentData)
-    })
-
-    const responseData = await response.json()
-
-    if (!response.ok) {
-      console.error('❌ Purchase intent creation failed:', JSON.stringify(responseData, null, 2))
-      return NextResponse.json(
-        { error: responseData.error || 'Failed to create purchase intent' },
-        { status: response.status }
-      )
-    }
+    // Call main API using service
+    const responseData = await BackendAPIService.createPurchaseIntent(jwt, purchaseIntentData)
 
     console.log('✅ Purchase intent created successfully:', {
       id: responseData.id,
@@ -178,25 +143,10 @@ export async function GET(request: NextRequest) {
       jwt = await generateJWT(defaultUserId, config, ['private'])
     }
 
-    console.log('📋 Fetching purchase intents for project:', PROJECT_ID)
+    console.log('📋 Fetching purchase intents')
 
-    // Call main API
-    const response = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/purchase-intents`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${jwt}`
-      }
-    })
-
-    const responseData = await response.json()
-
-    if (!response.ok) {
-      console.error('❌ Failed to fetch purchase intents:', responseData)
-      return NextResponse.json(
-        { error: responseData.error || 'Failed to fetch purchase intents' },
-        { status: response.status }
-      )
-    }
+    // Call main API using service
+    const responseData = await BackendAPIService.fetchPurchaseIntents(jwt)
 
     console.log('✅ Purchase intents fetched successfully:', {
       count: responseData.length || 0

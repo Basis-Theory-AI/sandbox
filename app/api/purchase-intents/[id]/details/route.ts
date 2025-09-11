@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateJWT, getJWTConfig } from '../../../../../lib/jwt/jwtService'
-
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000'
-const PROJECT_ID = process.env.JWT_PROJECT_ID
+import { BackendAPIService } from '../../../../services/backendApiService'
 
 // GET - Fetch Purchase Intent Details with Card Info
 export async function GET(
@@ -34,23 +32,8 @@ export async function GET(
 
     console.log('🔍 Fetching purchase intent details for:', id)
 
-    // Call main API
-    const response = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/purchase-intents/${id}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${jwt}`
-      }
-    })
-
-    const responseData = await response.json()
-
-    if (!response.ok) {
-      console.error('❌ Failed to fetch purchase intent details:', responseData)
-      return NextResponse.json(
-        { error: responseData.error || 'Failed to fetch purchase intent details' },
-        { status: response.status }
-      )
-    }
+    // Call main API using service
+    const responseData = await BackendAPIService.fetchPurchaseIntentDetails(jwt, id)
 
     console.log('✅ Purchase intent details fetched successfully:', {
       id: responseData.id,

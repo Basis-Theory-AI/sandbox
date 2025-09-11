@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { generateJWT, getJWTConfig } from '../../../../../lib/jwt/jwtService'
-
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000'
-const PROJECT_ID = process.env.JWT_PROJECT_ID
+import { BackendAPIService } from '../../../../services/backendApiService'
 
 // POST - Verify Purchase Intent (proxy to main API)
 export async function POST(
@@ -40,25 +38,8 @@ export async function POST(
       hasPayload: !!body.payload
     })
 
-    // Proxy to main API server
-    const response = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/purchase-intents/${id}/verify`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${jwt}`
-      },
-      body: JSON.stringify(body)
-    })
-
-    const responseData = await response.json()
-
-    if (!response.ok) {
-      console.error('❌ Purchase intent verification failed:', responseData)
-      return NextResponse.json(
-        { error: responseData.error || 'Failed to verify purchase intent' },
-        { status: response.status }
-      )
-    }
+    // Call main API using service
+    const responseData = await BackendAPIService.verifyPurchaseIntent(jwt, id, body)
 
     console.log('✅ Purchase intent verification successful:', {
       id,

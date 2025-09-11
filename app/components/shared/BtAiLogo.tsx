@@ -1,4 +1,4 @@
-export function BasisTheoryLogo({
+export function BtAiLogo({
   className = "w-32 h-auto",
 }: {
   className?: string;
