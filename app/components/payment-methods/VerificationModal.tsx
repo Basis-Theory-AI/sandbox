@@ -11,8 +11,6 @@ interface VerificationModalProps {
     brand: string
     last4?: string
   }
-  jwt: string
-  visaSession?: any
   onSuccess: (result: any) => void
   onError: (error: string) => void
 }
@@ -21,8 +19,6 @@ export function VerificationModal({
   isOpen, 
   onClose, 
   intent, 
-  jwt, 
-  visaSession,
   onSuccess, 
   onError 
 }: VerificationModalProps) {

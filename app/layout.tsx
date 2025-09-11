@@ -1,25 +1,18 @@
-import Script from 'next/script'
-import './globals.css'
+import "./globals.css";
 
 export const metadata = {
-    title: 'BT AI Demo',
-    description: 'BT AI Demo',
-}
+  title: "BT AI Playground",
+  description: "Application for demonstrating the Basis Theory AI platform",
+};
 
 export default function RootLayout({
-    children,
+  children,
 }: {
-    children: React.ReactNode
+  children: React.ReactNode;
 }) {
-    return (
-        <html lang="en">
-            <head>
-                <Script
-                    src="https://js.basistheory.com"
-                    strategy="beforeInteractive"
-                />
-            </head>
-            <body>{children}</body>
-        </html>
-    )
-} 
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}

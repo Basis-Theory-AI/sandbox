@@ -180,7 +180,6 @@ export function PaymentMethodList({
         throw new Error(data.error || 'Failed to create purchase intent')
       }
 
-      console.log('✅ Purchase intent created:', data)
       onPurchaseIntentCreated?.(data)
       
     } catch (error) {
