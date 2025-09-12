@@ -39,7 +39,7 @@ export class BtAiApiService {
    * @returns The list of payment methods
    */
   static async fetchPaymentMethods(jwt: string): Promise<any[]> {
-    const response = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/payment-methods`, {
+    const response = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/payment-methods?limit=5`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${jwt}`
@@ -101,7 +101,7 @@ export class BtAiApiService {
    * Fetch purchase intents
    */
   static async fetchPurchaseIntents(jwt: string): Promise<any[]> {
-    const response = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/purchase-intents`, {
+    const response = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/purchase-intents?limit=5`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${jwt}`

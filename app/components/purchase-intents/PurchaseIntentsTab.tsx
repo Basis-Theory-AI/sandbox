@@ -12,7 +12,7 @@ export function PurchaseIntentsTab({ privateJWT }: PurchaseIntentsTabProps) {
     usePurchaseIntents(privateJWT);
 
   return (
-    <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
+    <div className="bg-[#0D0D0F] backdrop-blur border border-white/10 rounded-xl p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-[#f4f4f5]">
           Purchase Intents

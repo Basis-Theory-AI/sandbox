@@ -137,8 +137,8 @@ export function PurchaseIntentList({
                 <div className="font-mono text-sm text-[#f4f4f5]">
                   {intent.id}
                 </div>
-                <StatusBadge status={intent.status} />
                 <CredentialTypeBadge type={intent.credentialType} />
+                <StatusBadge status={intent.status} />
               </div>
 
               <div className="flex items-center gap-4 text-xs text-[#a1a1aa]">

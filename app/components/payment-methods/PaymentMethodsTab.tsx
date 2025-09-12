@@ -31,44 +31,53 @@ export function PaymentMethodsTab({
 
   return (
     <>
-      <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-[#f4f4f5]">
-            Payment Methods
-          </h2>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setCreateModalOpen(true)}
-              disabled={!publicJWT}
-              className="px-4 py-2 bg-[#bff660] text-[#131316] text-sm font-medium rounded-lg hover:bg-[#b2f63d] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Create Payment Method
-            </button>
-            <button
-              onClick={fetchPaymentMethods}
-              disabled={!privateJWT}
-              className="px-3 py-1.5 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Refresh
-            </button>
-          </div>
-        </div>
-        {!privateJWT ? (
+      {!privateJWT ? (
+        <div className="bg-[#0D0D0F] backdrop-blur border border-white/10 rounded-xl p-6">
           <div className="text-center py-8 text-[#a1a1aa]">
             <p className="mb-2">Generate JWTs in the Authentication Tab</p>
             <p className="text-sm">
               Private JWT is required to fetch Payment Methods
             </p>
           </div>
-        ) : (
+        </div>
+      ) : (
+        <div className="py-8">
+          {/* Title, Subtitle and Actions */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-2xl font-semibold text-[#f4f4f5] mb-2">
+                Payment Methods
+              </h1>
+              <p className="text-base text-[#a1a1aa]">
+                Manage your stored payment methods and create purchase intents
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setCreateModalOpen(true)}
+                disabled={!publicJWT}
+                className="px-4 py-2 bg-[#bff660] text-[#131316] text-sm font-medium rounded-lg hover:bg-[#b2f63d] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Create
+              </button>
+              <button
+                onClick={fetchPaymentMethods}
+                className="px-3 py-1.5 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200"
+              >
+                Refresh
+              </button>
+            </div>
+          </div>
           <PaymentMethodList
             jwt={privateJWT}
             paymentMethods={paymentMethods}
             onRefresh={fetchPaymentMethods}
             fetching={fetching}
+            onCreatePaymentMethod={() => setCreateModalOpen(true)}
+            canCreate={!!publicJWT}
           />
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Payment Method Creation Modal */}
       <PaymentMethodCreateModal

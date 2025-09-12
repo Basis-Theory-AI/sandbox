@@ -81,7 +81,7 @@ export function AuthenticationTab({ onJWTsChanged }: AuthenticationTabProps) {
   return (
     <div className="space-y-6">
       {/* Entity ID Input */}
-      <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-4">
+      <div className="bg-[#0D0D0F] backdrop-blur border border-white/10 rounded-xl p-4">
         <h3 className="text-sm font-semibold text-[#f4f4f5] mb-3">
           Entity Configuration
         </h3>
