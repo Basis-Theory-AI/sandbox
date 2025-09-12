@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateJWT, getJWTConfig } from '../../../../lib/jwt/jwtService'
+import { generateJWT, getJWTConfig } from '../../../services/jwtService'
 
 interface JWTRequest {
   entityId: string

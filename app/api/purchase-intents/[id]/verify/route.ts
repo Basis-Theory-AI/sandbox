@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateJWT, getJWTConfig } from '../../../../../lib/jwt/jwtService'
-import { BackendAPIService } from '../../../../services/backendApiService'
+import { generateJWT, getJWTConfig } from '../../../../services/jwtService'
+import { BtAiApiService } from '../../../../services/btAiApiService'
 
 // POST - Verify Purchase Intent (proxy to main API)
 export async function POST(
@@ -39,7 +39,7 @@ export async function POST(
     })
 
     // Call main API using service
-    const responseData = await BackendAPIService.verifyPurchaseIntent(jwt, id, body)
+    const responseData = await BtAiApiService.verifyPurchaseIntent(jwt, id, body)
 
     console.log('✅ Purchase intent verification successful:', {
       id,

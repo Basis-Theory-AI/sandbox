@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { VerificationModal } from "../payment-methods/VerificationModal";
-import { CardDetailsModal } from "./CardDetailsModal";
+import { PaymentMethodVerifyModal } from "../payment-methods/PaymentMethodVerifyModal";
+import { PurchaseIntentCredentialModal } from "./PurchaseIntentCredentialModal";
 
 interface PaymentMethod {
   id: string;
@@ -242,18 +242,13 @@ export function PurchaseIntentList({
   onError,
   jwt,
 }: PurchaseIntentListProps) {
-  const [verificationModalOpen, setVerificationModalOpen] =
-    React.useState(false);
-  const [selectedIntent, setSelectedIntent] =
-    React.useState<PurchaseIntent | null>(null);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] =
-    React.useState<PaymentMethod | null>(null);
+  const [verificationModalOpen, setVerificationModalOpen] = React.useState(false);
+  const [selectedIntent, setSelectedIntent] = React.useState<PurchaseIntent | null>(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = React.useState<PaymentMethod | null>(null);
 
-  // Card details modal state
-  const [cardDetailsModalOpen, setCardDetailsModalOpen] = useState(false);
-  const [cardDetails, setCardDetails] = useState<any>(null);
-  const [selectedCardIntentId, setSelectedCardIntentId] = useState<string>("");
-  const [fetchingCardDetails, setFetchingCardDetails] = useState(false);
+  // credential modal state
+  const [credentialModalOpen, setCredentialModalOpen] = useState(false);
+  const [fetchingIntent, setFetchingIntent] = useState(false);
 
   const getPaymentMethodForIntent = (
     intent: PurchaseIntent
@@ -263,7 +258,7 @@ export function PurchaseIntentList({
     );
   };
 
-  const handleGetCard = async (intent: PurchaseIntent) => {
+  const handleGetCredential = async (intent: PurchaseIntent) => {
     const paymentMethod = getPaymentMethodForIntent(intent);
     const cardBrand = paymentMethod?.card?.brand?.toLowerCase();
 
@@ -274,11 +269,11 @@ export function PurchaseIntentList({
     }
 
     if (intent.status !== "active") {
-      onError?.("Card details are only available for active purchase intents");
+      onError?.("Credential details are only available for active purchase intents");
       return;
     }
 
-    setFetchingCardDetails(true);
+    setFetchingIntent(true);
     setSelectedCardIntentId(intent.id);
 
     try {
@@ -303,8 +298,8 @@ export function PurchaseIntentList({
       // Handle both response formats
       if (cardBrand === "mastercard" && data.card) {
         // Mastercard virtual card format
-        setCardDetails(data.card);
-        setCardDetailsModalOpen(true);
+        setCredential(data.card);
+        setCredentialModalOpen(true);
       } else if (cardBrand === "visa" && data.credentials) {
         // Visa credentials format - convert to card format for the modal
         const cardFromCredentials = {
@@ -317,8 +312,8 @@ export function PurchaseIntentList({
           correlationId: data.credentials.correlationId,
         };
 
-        setCardDetails(cardFromCredentials);
-        setCardDetailsModalOpen(true);
+        setCredential(cardFromCredentials);
+        setCredentialModalOpen(true);
       } else {
         // Neither card nor credentials available
         throw new Error(
@@ -331,7 +326,7 @@ export function PurchaseIntentList({
         error instanceof Error ? error.message : "Failed to fetch card details"
       );
     } finally {
-      setFetchingCardDetails(false);
+      setFetchingIntent(false);
     }
   };
 
@@ -360,11 +355,10 @@ export function PurchaseIntentList({
       return;
     }
 
-    setFetchingCardDetails(true);
+    setFetchingIntent(true);
     setSelectedCardIntentId(intent.id);
 
     try {
-
       const headers: HeadersInit = {};
 
       // Add JWT if provided (should have private role for fetching purchase intent details)
@@ -396,8 +390,8 @@ export function PurchaseIntentList({
           credentialType: intent.credentialType,
         };
 
-        setCardDetails(networkTokenDetails);
-        setCardDetailsModalOpen(true);
+        setCredential(networkTokenDetails);
+        setCredentialModalOpen(true);
       } else {
         // No network token data available
         throw new Error(
@@ -410,7 +404,7 @@ export function PurchaseIntentList({
         error instanceof Error ? error.message : "Failed to fetch network token"
       );
     } finally {
-      setFetchingCardDetails(false);
+      setFetchingIntent(false);
     }
   };
 
@@ -420,6 +414,7 @@ export function PurchaseIntentList({
       return;
     }
 
+    // TODO: DO I NEED THIS?
     const paymentMethod = getPaymentMethodForIntent(intent);
 
     if (!paymentMethod) {
@@ -427,28 +422,33 @@ export function PurchaseIntentList({
       onError?.(errorMsg);
       return;
     }
+
     setSelectedIntent(intent);
     setSelectedPaymentMethod(paymentMethod);
     setVerificationModalOpen(true);
     onVerificationStarted?.(intent.id);
   };
 
-  const handleModalClose = () => {
-    setVerificationModalOpen(false);
+  const clearSelectedIntent = () => {
     setSelectedIntent(null);
     setSelectedPaymentMethod(null);
   };
 
+  const handleVerificationModalClose = () => {
+    setVerificationModalOpen(false);
+    clearSelectedIntent();
+  };
+
   const handleVerificationSuccess = (result: any) => {
     onVerificationCompleted?.(selectedIntent?.id || "", result);
+
     onRefresh?.();
-    handleModalClose();
+    handleVerificationModalClose();
   };
 
   const handleVerificationError = (error: string) => {
-    console.error("❌ Verification failed:", error);
     onError?.(error);
-    handleModalClose();
+    handleVerificationModalClose();
   };
 
   if (loading) {
@@ -456,7 +456,7 @@ export function PurchaseIntentList({
       <div className="flex items-center justify-center py-8">
         <div className="flex items-center gap-3 text-[#a1a1aa]">
           <div className="w-5 h-5 border-2 border-[#a1a1aa] border-t-[#bff660] rounded-full animate-spin"></div>
-          <span className="text-sm">Loading purchase intents...</span>
+          <span className="text-sm">Loading Purchase Intents...</span>
         </div>
       </div>
     );
@@ -466,7 +466,7 @@ export function PurchaseIntentList({
     return (
       <div className="text-center py-8">
         <div className="text-[#a1a1aa] text-sm mb-3">
-          No purchase intents found
+          No Purchase Intents found
         </div>
         <button
           onClick={onRefresh}
@@ -558,10 +558,9 @@ export function PurchaseIntentList({
                 if (showGetCardButton) {
                   return (
                     <button
-                      onClick={() => handleGetCard(intent)}
+                      onClick={() => handleGetCredential(intent)}
                       disabled={
-                        fetchingCardDetails &&
-                        selectedCardIntentId === intent.id
+                        fetchingIntent && selectedCardIntentId === intent.id
                       }
                       className="px-3 py-1.5 bg-green-500 text-white text-xs font-medium rounded-lg hover:bg-green-600 transition-all duration-200 hover:-translate-y-0.5 flex items-center gap-1 disabled:opacity-50"
                     >
@@ -579,7 +578,7 @@ export function PurchaseIntentList({
                         />
                       </svg>
                       <span>
-                        {fetchingCardDetails &&
+                        {fetchingIntent &&
                         selectedCardIntentId === intent.id
                           ? "Loading..."
                           : "Get Card"}
@@ -591,8 +590,7 @@ export function PurchaseIntentList({
                     <button
                       onClick={() => handleGetToken(intent)}
                       disabled={
-                        fetchingCardDetails &&
-                        selectedCardIntentId === intent.id
+                        fetchingIntent && selectedCardIntentId === intent.id
                       }
                       className="px-3 py-1.5 bg-purple-500 text-white text-xs font-medium rounded-lg hover:bg-purple-600 transition-all duration-200 hover:-translate-y-0.5 flex items-center gap-1 disabled:opacity-50"
                     >
@@ -610,7 +608,7 @@ export function PurchaseIntentList({
                         />
                       </svg>
                       <span>
-                        {fetchingCardDetails &&
+                        {fetchingIntent &&
                         selectedCardIntentId === intent.id
                           ? "Loading..."
                           : "Get Token"}
@@ -628,9 +626,9 @@ export function PurchaseIntentList({
 
       {/* Verification Modal */}
       {selectedIntent && selectedPaymentMethod && jwt && (
-        <VerificationModal
+        <PaymentMethodVerifyModal
           isOpen={verificationModalOpen}
-          onClose={handleModalClose}
+          onClose={handleVerificationModalClose}
           intent={{
             id: selectedIntent.id,
             brand: selectedPaymentMethod.card.brand,
@@ -642,14 +640,14 @@ export function PurchaseIntentList({
       )}
 
       {/* Card Details Modal */}
-      <CardDetailsModal
-        isOpen={cardDetailsModalOpen}
+      <PurchaseIntentCredentialModal
+        isOpen={credentialModalOpen}
         onClose={() => {
-          setCardDetailsModalOpen(false);
-          setCardDetails(null);
+          setCredentialModalOpen(false);
+          setCredential(null);
           setSelectedCardIntentId("");
         }}
-        cardDetails={cardDetails}
+        credential={credential}
         purchaseIntentId={selectedCardIntentId}
       />
     </div>

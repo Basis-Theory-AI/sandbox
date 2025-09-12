@@ -13,64 +13,24 @@ interface PlaygroundProps {
   initialJWT: string;
 }
 
+type Tab = "authentication" | "payment-methods" | "purchase-intents";
+
 export function Playground({ initialJWT }: PlaygroundProps) {
+  const [activeTab, setActiveTab] = useState<Tab>("authentication");
+
+  // jwt state
+  const [publicJWT, setPublicJWT] = useState(initialJWT);
+  const [privateJWT, setPrivateJWT] = useState("");
+
   const { getStatus, updateJwt } = useBtAi();
   const visaStatus = getStatus().visa;
   const mastercardStatus = getStatus().mastercard;
 
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<
-    "authentication" | "payment-methods" | "purchase-intents"
-  >("authentication");
-
-  // Simple JWT state management
-  const [publicJWT, setPublicJWT] = useState(initialJWT); // For payment method creation
-  const [privateJWT, setPrivateJWT] = useState(""); // For data fetching
-
-  // Use custom hooks for data management (still needed for purchase intents tab)
-  const paymentMethodsHook = usePaymentMethods(privateJWT);
-  const purchaseIntentsHook = usePurchaseIntents(privateJWT);
-
   const handleJWTsChanged = (publicToken: string, privateToken: string) => {
     setPublicJWT(publicToken);
     setPrivateJWT(privateToken);
-    updateJwt(publicToken); // update the JWT in the SDK provider
-  };
 
-  // Handle success messages
-  const handlePurchaseIntentCreated = (newPurchaseIntent: any) => {
-    setSuccessMessage("Purchase Intent Created Successfully!");
-    setError(null);
-    purchaseIntentsHook.refresh();
-    setTimeout(() => setSuccessMessage(null), 5000);
-  };
-
-  const handleVerificationStarted = (intentId: string) => {
-    setError(null);
-    setSuccessMessage(null);
-  };
-
-  const handleVerificationCompleted = (intentId: string, result: any) => {
-    if (result.status === "VERIFIED" || result.status === "ACTIVE") {
-      setSuccessMessage(
-        `Purchase Intent ${
-          result.status === "VERIFIED" ? "Verified" : "Activated"
-        } Successfully!`
-      );
-    } else {
-      setSuccessMessage(
-        "Verification step completed - check the intent status"
-      );
-    }
-
-    setError(null);
-    setTimeout(() => setSuccessMessage(null), 5000);
-  };
-
-  const handleError = (errorMessage: string) => {
-    setError(errorMessage);
-    setSuccessMessage(null);
+    updateJwt(publicToken);
   };
 
   return (
@@ -146,43 +106,17 @@ export function Playground({ initialJWT }: PlaygroundProps) {
           </button>
         </div>
 
-        {/* Status Messages */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl flex items-center gap-3">
-            <span className="text-red-500">❌</span>
-            <span className="text-sm">{error}</span>
-          </div>
-        )}
-
-        {successMessage && (
-          <div className="mb-6 p-4 bg-[#bff660]/10 border border-[#bff660]/20 text-[#bff660] rounded-xl flex items-center gap-3">
-            <span className="text-[#bff660]">✅</span>
-            <span className="text-sm">{successMessage}</span>
-          </div>
-        )}
-
         {/* Tab Content */}
         {activeTab === "authentication" && (
           <AuthenticationTab onJWTsChanged={handleJWTsChanged} />
         )}
 
         {activeTab === "payment-methods" && (
-          <PaymentMethodsTab
-            publicJWT={publicJWT}
-            privateJWT={privateJWT}
-            onPurchaseIntentCreated={handlePurchaseIntentCreated}
-            onError={handleError}
-          />
+          <PaymentMethodsTab publicJWT={publicJWT} privateJWT={privateJWT} />
         )}
 
         {activeTab === "purchase-intents" && (
-          <PurchaseIntentsTab
-            privateJWT={privateJWT}
-            paymentMethods={paymentMethodsHook.paymentMethods}
-            onVerificationStarted={handleVerificationStarted}
-            onVerificationCompleted={handleVerificationCompleted}
-            onError={handleError}
-          />
+          <PurchaseIntentsTab privateJWT={privateJWT} />
         )}
       </div>
     </div>

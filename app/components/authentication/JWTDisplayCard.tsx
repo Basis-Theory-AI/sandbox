@@ -1,11 +1,10 @@
 "use client";
 
-import { JWTService } from "../../services/jwtService";
-
+import { decodeJWT } from "../../services/jwtService";
 interface JWTDisplayCardProps {
   title: string;
   description: string;
-  role: 'public' | 'private';
+  role: "public" | "private";
   jwt: string;
   isCreating: boolean;
   copied: boolean;
@@ -27,12 +26,8 @@ export function JWTDisplayCard({
     <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-4">
       <div className="flex items-center justify-between mb-3">
         <div>
-          <h3 className="text-sm font-semibold text-[#f4f4f5]">
-            {title}
-          </h3>
-          <p className="text-xs text-[#a1a1aa]">
-            {description}
-          </p>
+          <h3 className="text-sm font-semibold text-[#f4f4f5]">{title}</h3>
+          <p className="text-xs text-[#a1a1aa]">{description}</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -59,7 +54,7 @@ export function JWTDisplayCard({
           </div>
           <div className="bg-black/30 rounded-lg p-3 font-mono text-xs text-[#a1a1aa] max-h-32 overflow-y-auto">
             <pre className="whitespace-pre-wrap">
-              {JSON.stringify(JWTService.decodeJWT(jwt), null, 2)}
+              {JSON.stringify(decodeJWT(jwt), null, 2)}
             </pre>
           </div>
         </>

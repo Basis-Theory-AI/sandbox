@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateJWT, getJWTConfig } from '../../../lib/jwt/jwtService'
-import { BackendAPIService } from '../../services/backendApiService'
+import { generateJWT, getJWTConfig } from '../../services/jwtService'
+import { BtAiApiService } from '../../services/btAiApiService'
 
 // Default mandates configuration
 const DEFAULT_MANDATES = [
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     // First, fetch payment method details to determine credential type
     console.log('📋 Fetching payment method details:', paymentMethodId.slice(-8))
     
-    const paymentMethodData = await BackendAPIService.fetchPaymentMethod(jwt, paymentMethodId)
+    const paymentMethodData = await BtAiApiService.fetchPaymentMethod(jwt, paymentMethodId)
     
     // Determine credential type based on card brand
     // AMEX and Discover use network-token, Visa and Mastercard use virtual-card
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Call main API using service
-    const responseData = await BackendAPIService.createPurchaseIntent(jwt, purchaseIntentData)
+    const responseData = await BtAiApiService.createPurchaseIntent(jwt, purchaseIntentData)
 
     console.log('✅ Purchase intent created successfully:', {
       id: responseData.id,
@@ -146,7 +146,7 @@ export async function GET(request: NextRequest) {
     console.log('📋 Fetching purchase intents')
 
     // Call main API using service
-    const responseData = await BackendAPIService.fetchPurchaseIntents(jwt)
+    const responseData = await BtAiApiService.fetchPurchaseIntents(jwt)
 
     console.log('✅ Purchase intents fetched successfully:', {
       count: responseData.length || 0

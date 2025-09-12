@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { JWTService } from "../../services/jwtService";
+import { APIService } from "../../services/apiService";
+import { copyToClipboard } from "../../utils";
 import { JWTDisplayCard } from "./JWTDisplayCard";
 
 interface AuthenticationTabProps {
@@ -22,8 +23,8 @@ export function AuthenticationTab({ onJWTsChanged }: AuthenticationTabProps) {
     const initializeJWTs = async () => {
       try {
         const [publicToken, privateToken] = await Promise.all([
-          JWTService.generateJWT(entityId, "public"),
-          JWTService.generateJWT(entityId, "private"),
+          APIService.generateJWT(entityId, "public"),
+          APIService.generateJWT(entityId, "private"),
         ]);
 
         setPublicJWT(publicToken);
@@ -43,7 +44,7 @@ export function AuthenticationTab({ onJWTsChanged }: AuthenticationTabProps) {
     setter(true);
 
     try {
-      const jwt = await JWTService.generateJWT(entityId, role);
+      const jwt = await APIService.generateJWT(entityId, role);
 
       if (role === "public") {
         setPublicJWT(jwt);
@@ -61,18 +62,18 @@ export function AuthenticationTab({ onJWTsChanged }: AuthenticationTabProps) {
     }
   };
 
-  // Handlers for JWT cards
+  // handlers for JWT cards
   const handlePublicGenerate = () => generateJWT("public");
   const handlePrivateGenerate = () => generateJWT("private");
 
   const handlePublicCopy = async () => {
-    await JWTService.copyToClipboard(publicJWT);
+    await copyToClipboard(publicJWT);
     setCopiedPublic(true);
     setTimeout(() => setCopiedPublic(false), 2000);
   };
 
   const handlePrivateCopy = async () => {
-    await JWTService.copyToClipboard(privateJWT);
+    await copyToClipboard(privateJWT);
     setCopiedPrivate(true);
     setTimeout(() => setCopiedPrivate(false), 2000);
   };

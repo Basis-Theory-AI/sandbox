@@ -1,14 +1,17 @@
 /**
- * Backend service for making calls to the main BasisTheory API
- * Used by API routes (server-side)
+ * Backend service for making calls to the main BT API
  */
 
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000';
 const PROJECT_ID = process.env.JWT_PROJECT_ID;
 
-export class BackendAPIService {
+export class BtAiApiService {
   /**
    * Create a payment method
+   * 
+   * @param jwt - The JWT token for authentication
+   * @param paymentMethodData - The data for the payment method
+   * @returns The created payment method
    */
   static async createPaymentMethod(jwt: string, paymentMethodData: any): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/payment-methods`, {
@@ -31,6 +34,9 @@ export class BackendAPIService {
 
   /**
    * Fetch payment methods
+   * 
+   * @param jwt - The JWT token for authentication
+   * @returns The list of payment methods
    */
   static async fetchPaymentMethods(jwt: string): Promise<any[]> {
     const response = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/payment-methods`, {

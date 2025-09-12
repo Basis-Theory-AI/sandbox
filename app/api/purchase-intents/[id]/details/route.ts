@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateJWT, getJWTConfig } from '../../../../../lib/jwt/jwtService'
-import { BackendAPIService } from '../../../../services/backendApiService'
+import { generateJWT, getJWTConfig } from '../../../../services/jwtService'
+import { BtAiApiService } from '../../../../services/btAiApiService'
 
 // GET - Fetch Purchase Intent Details with Card Info
 export async function GET(
@@ -33,7 +33,7 @@ export async function GET(
     console.log('🔍 Fetching purchase intent details for:', id)
 
     // Call main API using service
-    const responseData = await BackendAPIService.fetchPurchaseIntentDetails(jwt, id)
+    const responseData = await BtAiApiService.fetchPurchaseIntentDetails(jwt, id)
 
     console.log('✅ Purchase intent details fetched successfully:', {
       id: responseData.id,

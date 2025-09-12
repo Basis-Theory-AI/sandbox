@@ -2,7 +2,7 @@ import "./globals.css";
 
 export const metadata = {
   title: "BT AI Playground",
-  description: "Application for demonstrating the Basis Theory AI platform",
+  description: "Application for demonstrating the BT AI platform",
 };
 
 export default function RootLayout({

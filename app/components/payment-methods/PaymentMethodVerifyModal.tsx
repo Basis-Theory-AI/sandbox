@@ -1,43 +1,42 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { 
-  useBasisTheory
-} from '@basis-theory-ai/react'
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useBtAi } from "@basis-theory-ai/react";
 
-interface VerificationModalProps {
-  isOpen: boolean
-  onClose: () => void
+interface PaymentMethodVerifyModalProps {
+  isOpen: boolean;
+  onClose: () => void;
   intent: {
-    id: string
-    brand: string
-    last4?: string
-  }
-  onSuccess: (result: any) => void
-  onError: (error: string) => void
+    id: string;
+    brand: string;
+    last4?: string;
+  };
+  onSuccess: (result: any) => void;
+  onError: (error: string) => void;
 }
 
-export function VerificationModal({ 
-  isOpen, 
-  onClose, 
-  intent, 
-  onSuccess, 
-  onError 
-}: VerificationModalProps) {
-  const { verifyPurchaseIntent } = useBasisTheory()
-  const verificationStartedRef = useRef(false)
+export function PaymentMethodVerifyModal({
+  isOpen,
+  onClose,
+  intent,
+  onSuccess,
+  onError,
+}: PaymentMethodVerifyModalProps) {
+  const { verifyPurchaseIntent } = useBtAi();
+  const verificationStartedRef = useRef(false);
 
   const startVerification = useCallback(async () => {
     try {
-      const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || '00000000-0000-0000-0000-000000000000';
-      
+      const projectId =
+        process.env.NEXT_PUBLIC_PROJECT_ID ||
+        "00000000-0000-0000-0000-000000000000";
+
       // Call SDK method - this will show the unified modal automatically
       const result = await verifyPurchaseIntent(projectId, intent.id);
-      
+
       // SDK handles everything internally, we just close this trigger modal
       onSuccess(result);
       onClose();
-      
     } catch (error) {
-      onError(error instanceof Error ? error.message : 'Verification failed');
+      onError(error instanceof Error ? error.message : "Verification failed");
       onClose();
     }
   }, [verifyPurchaseIntent, intent.id, onSuccess, onClose, onError]);
@@ -48,7 +47,7 @@ export function VerificationModal({
       verificationStartedRef.current = true;
       startVerification();
     }
-    
+
     if (!isOpen) {
       verificationStartedRef.current = false;
     }
@@ -56,4 +55,4 @@ export function VerificationModal({
 
   // Don't render anything - the SDK will show its own beautiful modal
   return null;
-} 
+}
