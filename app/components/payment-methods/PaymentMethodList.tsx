@@ -7,32 +7,16 @@ interface PaymentMethodListProps {
   paymentMethods: any[];
   onRefresh?: () => void;
   fetching?: boolean;
-  onCreatePaymentMethod?: () => void;
-  canCreate?: boolean;
 }
 
-// Card Type Badge - shows icon + card type instead of brand name
+// Card Type Badge - teal pill with icon + card type
 function CardBadge({ brand, type }: { brand: string; type: string }) {
-  const getCardTypeColor = (type: string) => {
-    switch (type?.toLowerCase() ?? "credit") {
-      case "debit":
-        return "bg-purple-500/10 text-purple-400 border-purple-500/20";
-      case "credit":
-        return "bg-indigo-500/10 text-indigo-400 border-indigo-500/20";
-      case "prepaid":
-        return "bg-pink-500/10 text-pink-400 border-pink-500/20";
-      default:
-        return "bg-[#71717b]/10 text-[#e4e4e7] border-[#71717b]/20";
-    }
-  };
-
   const icon = getCardIcon(brand);
 
   return (
     <span
-      className={`px-2 py-1 text-xs font-medium rounded-lg border ${getCardTypeColor(
-        type
-      )} flex items-center gap-1`}
+      className="px-3 h-6 text-sm font-medium rounded-xl text-[#28D9D8] flex items-center gap-1 w-fit"
+      style={{ backgroundColor: "rgba(15, 187, 189, 0.1)" }}
     >
       {typeof icon === "string" ? <span>{icon}</span> : icon}
       <span>{type?.toUpperCase()} CARD</span>
@@ -45,8 +29,6 @@ export function PaymentMethodList({
   paymentMethods,
   onRefresh,
   fetching,
-  onCreatePaymentMethod,
-  canCreate,
 }: PaymentMethodListProps) {
   const { createPurchaseIntent, creating } = usePurchaseIntents(jwt);
 
@@ -89,71 +71,104 @@ export function PaymentMethodList({
 
   return (
     <>
-      {/* Payment Methods List */}
-      <div className="space-y-3">
-        {paymentMethods.map((method) => (
-          <div
-            key={method.id}
-            className="bg-white/5 backdrop-blur border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-200 group"
-          >
-            <div className="flex items-center justify-between">
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="font-mono text-sm text-[#f4f4f5]">
-                    {method.card.details.bin}••••{method.card.details.last4}
+      {/* Payment Methods Table */}
+      <div className="overflow-hidden rounded-lg border border-white/10">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-transparent">
+              <th className="px-4 py-3 text-left text-xs text-[#717179] font-medium">
+                ID
+              </th>
+              <th className="px-4 py-3 text-left text-xs text-[#717179] font-medium">
+                Type
+              </th>
+              <th className="px-4 py-3 text-left text-xs text-[#717179] font-medium">
+                Details
+              </th>
+              <th className="px-4 py-3 text-left text-xs text-[#717179] font-medium">
+                Created
+              </th>
+              <th className="px-4 py-3 text-left text-xs text-[#717179] font-medium">
+                Credential Types
+              </th>
+              <th className="px-4 py-3 text-left text-xs text-[#717179] font-medium">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {paymentMethods.map((method) => (
+              <tr
+                key={method.id}
+                className="h-12 bg-[#0D0D0FCC] hover:bg-white/5 transition-all duration-200 border-b border-white/5 last:border-b-0 cursor-pointer"
+              >
+                {/* ID */}
+                <td className="px-4 py-3">
+                  <span className="font-mono text-xs text-white">
+                    {method.id}
+                  </span>
+                </td>
+                {/* Type */}
+                <td className="px-4 py-3">
+                  <div className="inline-flex">
+                    <CardBadge
+                      brand={method.card.brand}
+                      type={method.card.type}
+                    />
                   </div>
-                  <div className="font-mono text-sm text-[#f4f4f5]">
+                </td>
+                {/* Details */}
+                <td className="px-4 py-3">
+                  <span className="font-mono text-sm text-[#f4f4f5]">
+                    {method.card.details.bin}••••{method.card.details.last4}{" "}
                     {String(method.card.details.expirationMonth).padStart(
                       2,
                       "0"
                     )}
                     /{String(method.card.details.expirationYear).slice(-2)}
+                  </span>
+                </td>
+                {/* Created */}
+                <td className="px-4 py-3">
+                  <span className="text-sm text-[#A1A1A9]">
+                    {new Date(method.createdAt).toLocaleDateString()}
+                  </span>
+                </td>
+                {/* Credentials Types */}
+                <td className="px-4 py-3">
+                  <div className="flex gap-2">
+                    {method.credentialTypes.map((credential: string) => (
+                      <span
+                        key={credential}
+                        className="h-6 px-3 bg-[#212124] text-[#A1A1A9] text-sm font-medium rounded-xl flex items-center"
+                      >
+                        {credential}
+                      </span>
+                    ))}
                   </div>
-                  <CardBadge
-                    brand={method.card.brand}
-                    type={method.card.type}
-                  />
-                </div>
-
-                <div className="flex items-center gap-4 text-xs text-[#a1a1aa]">
-                  <div className="flex items-center gap-1">
-                    <span>ID:</span>
-                    <span className="font-mono text-[#bff660]">
-                      {method.id}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span>Available Credentials:</span>
-                    <span className="text-[#fff]">
-                      [ {method.credentialTypes.join(", ")} ]
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-2 ml-4">
-                <button
-                  onClick={() => handleCreatePurchaseIntent(method)}
-                  disabled={creating}
-                  className="px-3 h-8 bg-[#B5F200] text-[#131316] text-sm font-medium font-sans rounded-lg hover:bg-[#A3E600] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 flex items-center gap-1"
-                >
-                  {creating ? (
-                    <>
-                      <div className="w-3 h-3 border border-[#131316] border-t-transparent rounded-full animate-spin"></div>
-                      <span>Creating...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Create Intent</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
+                </td>
+                {/* Actions */}
+                <td className="px-4 py-3 align-middle">
+                  <button
+                    onClick={() => handleCreatePurchaseIntent(method)}
+                    disabled={creating}
+                    className="px-3 h-6 text-[#C7FB20] text-sm font-medium font-sans rounded-lg hover:bg-opacity-20 transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 flex items-center gap-1"
+                    style={{ backgroundColor: "rgba(181, 242, 0, 0.1)" }}
+                  >
+                    {creating ? (
+                      <>
+                        <div className="w-3 h-3 border border-[#C7FB20] border-t-transparent rounded-full animate-spin"></div>
+                        <span>Creating...</span>
+                      </>
+                    ) : (
+                      <span>+ Intent</span>
+                    )}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </>
   );

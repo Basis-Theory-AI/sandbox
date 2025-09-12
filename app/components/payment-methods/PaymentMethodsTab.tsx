@@ -58,7 +58,7 @@ export function PaymentMethodsTab({
                 disabled={!publicJWT}
                 className="px-4 h-8 bg-[#B5F200] text-[#131316] text-sm font-medium font-sans rounded-lg hover:bg-[#A3E600] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
               >
-                Create
+                + Create
               </button>
               <button
                 onClick={fetchPaymentMethods}
@@ -73,8 +73,6 @@ export function PaymentMethodsTab({
             paymentMethods={paymentMethods}
             onRefresh={fetchPaymentMethods}
             fetching={fetching}
-            onCreatePaymentMethod={() => setCreateModalOpen(true)}
-            canCreate={!!publicJWT}
           />
         </div>
       )}
