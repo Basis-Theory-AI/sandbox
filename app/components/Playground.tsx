@@ -67,41 +67,45 @@ export function Playground({ initialJWT }: PlaygroundProps) {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-6">
-        {/* Tab Navigation */}
-        <div className="flex gap-1 mb-6 bg-white/5 backdrop-blur rounded-xl p-1 w-fit">
-          <button
-            onClick={() => setActiveTab("authentication")}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-              activeTab === "authentication"
-                ? "bg-[#bff660] text-[#131316]"
-                : "text-[#a1a1aa] hover:text-[#e4e4e7] hover:bg-white/5"
-            }`}
-          >
-            Authentication
-          </button>
-          <button
-            onClick={() => setActiveTab("payment-methods")}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-              activeTab === "payment-methods"
-                ? "bg-[#bff660] text-[#131316]"
-                : "text-[#a1a1aa] hover:text-[#e4e4e7] hover:bg-white/5"
-            }`}
-          >
-            Payment Methods
-          </button>
-          <button
-            onClick={() => setActiveTab("purchase-intents")}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-              activeTab === "purchase-intents"
-                ? "bg-[#bff660] text-[#131316]"
-                : "text-[#a1a1aa] hover:text-[#e4e4e7] hover:bg-white/5"
-            }`}
-          >
-            Purchase Intents
-          </button>
+      {/* Tab Navigation Header */}
+      <div className="border-b border-white/10 bg-[#0D0D0F]">
+        <div className="max-w-6xl mx-auto px-6 py-3">
+          <div className="flex gap-6 items-center">
+            <button
+              onClick={() => setActiveTab("authentication")}
+              className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-lg ${
+                activeTab === "authentication"
+                  ? "bg-[#bff660] text-[#131316]"
+                  : "text-[#a1a1aa] hover:text-[#e4e4e7]"
+              }`}
+            >
+              Authentication
+            </button>
+            <button
+              onClick={() => setActiveTab("payment-methods")}
+              className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-lg ${
+                activeTab === "payment-methods"
+                  ? "bg-[#bff660] text-[#131316]"
+                  : "text-[#a1a1aa] hover:text-[#e4e4e7]"
+              }`}
+            >
+              Payment Methods
+            </button>
+            <button
+              onClick={() => setActiveTab("purchase-intents")}
+              className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-lg ${
+                activeTab === "purchase-intents"
+                  ? "bg-[#bff660] text-[#131316]"
+                  : "text-[#a1a1aa] hover:text-[#e4e4e7]"
+              }`}
+            >
+              Purchase Intents
+            </button>
+          </div>
         </div>
+      </div>
 
+      <div className="max-w-6xl mx-auto px-6 py-6">
         {/* Tab Content */}
         {activeTab === "authentication" && (
           <AuthenticationTab onJWTsChanged={handleJWTsChanged} />
