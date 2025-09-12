@@ -255,8 +255,8 @@ export function PurchaseIntentCredentialModal({
             intent.credentialType === "network-token"
               ? "bg-purple-500/10 border border-purple-500/20"
               : intent.credentialType === "virtual-card"
-              ? "bg-blue-500/10 border border-blue-500/20"
-              : "bg-yellow-500/10 border border-yellow-500/20"
+              ? "bg-yellow-500/10 border border-yellow-500/20"
+              : ""
           }`}
         >
           <div className="flex items-start gap-2">
@@ -296,31 +296,31 @@ export function PurchaseIntentCredentialModal({
                 className={`text-xs font-medium ${
                   intent.credentialType === "network-token"
                     ? "text-purple-400"
-                    : intent.type === "virtual-card"
-                    ? "text-blue-400"
-                    : "text-yellow-400"
+                    : intent.credentialType === "virtual-card"
+                    ? "text-yellow-300"
+                    : ""
                 }`}
               >
                 {intent.credentialType === "network-token"
                   ? "Network Token"
                   : intent.credentialType === "virtual-card"
-                  ? "Visa Credentials"
-                  : "Virtual Card"}
+                  ? "Virtual Card"
+                  : "Unknown Credential"}
               </p>
               <p
                 className={`text-xs ${
                   intent.credentialType === "network-token"
                     ? "text-purple-300"
-                    : intent.type === "virtual-card"
-                    ? "text-blue-300"
-                    : "text-yellow-300"
+                    : intent.credentialType === "virtual-card"
+                    ? "text-yellow-300"
+                    : ""
                 }`}
               >
                 {intent.credentialType === "network-token"
                   ? "This is a network token provided directly by the card network for secure transactions."
                   : intent.credentialType === "virtual-card"
-                  ? "Tokenized card credentials secured by Visa for transaction processing."
-                  : "This is a temporary virtual card for secure transactions only."}
+                  ? "This is a temporary virtual card for secure transactions only."
+                  : ""}
               </p>
             </div>
           </div>

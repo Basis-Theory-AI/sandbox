@@ -32,38 +32,36 @@ export function Playground({ initialJWT }: PlaygroundProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#131316] text-[#f4f4f5] font-['Inter',sans-serif]">
+    <div className="min-h-screen bg-[#0D0D0F] text-[#f4f4f5] font-['Inter',sans-serif]">
       {/* Header */}
-      <div className="border-b border-white/10 bg-white/5 backdrop-blur">
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <BtAiLogo className="w-28 h-auto" />
-            </div>
+      <div className="border-b border-white/10 bg-[#0D0D0F] backdrop-blur max-h-16">
+        <div className="max-w-6xl mx-auto px-6 py-3 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <BtAiLogo className="w-28 h-auto" />
+          </div>
 
-            {/* Status Indicators */}
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-2 h-2 rounded-full ${
-                    visaStatus ? "bg-[#bff660]" : "bg-yellow-500"
-                  }`}
-                ></div>
-                <span className="text-xs font-medium text-[#e4e4e7]">
-                  Visa Authentication SDK {visaStatus ? "Ready" : "Loading"}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-2 h-2 rounded-full ${
-                    mastercardStatus ? "bg-[#bff660]" : "bg-yellow-500"
-                  }`}
-                ></div>
-                <span className="text-xs font-medium text-[#e4e4e7]">
-                  Mastercard Authentication SDK{" "}
-                  {mastercardStatus ? "Ready" : "Loading"}
-                </span>
-              </div>
+          {/* Status Indicators */}
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  visaStatus ? "bg-[#bff660]" : "bg-yellow-500"
+                }`}
+              ></div>
+              <span className="text-xs font-medium text-[#e4e4e7]">
+                Visa Authentication SDK {visaStatus ? "Ready" : "Loading"}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div
+                className={`w-2 h-2 rounded-full ${
+                  mastercardStatus ? "bg-[#bff660]" : "bg-yellow-500"
+                }`}
+              ></div>
+              <span className="text-xs font-medium text-[#e4e4e7]">
+                Mastercard Authentication SDK{" "}
+                {mastercardStatus ? "Ready" : "Loading"}
+              </span>
             </div>
           </div>
         </div>

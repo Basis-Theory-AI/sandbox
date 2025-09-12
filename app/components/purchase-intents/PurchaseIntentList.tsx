@@ -16,12 +16,8 @@ function StatusBadge({ status }: { status: string }) {
     switch (status.toLowerCase()) {
       case "verify":
         return "bg-yellow-500/10 text-yellow-400 border-yellow-500/20";
-      case "verified":
-        return "bg-[#bff660]/10 text-[#bff660] border-[#bff660]/20";
       case "active":
         return "bg-green-500/10 text-green-400 border-green-500/20";
-      case "pending":
-        return "bg-blue-500/10 text-blue-400 border-blue-500/20";
       case "expired":
         return "bg-red-500/10 text-red-400 border-red-500/20";
       default:
@@ -43,7 +39,7 @@ function StatusBadge({ status }: { status: string }) {
 // Credential type badge
 function CredentialTypeBadge({ type }: { type: string }) {
   return (
-    <span className="px-2 py-1 text-xs font-mono bg-white/5 text-[#e4e4e7] rounded border border-white/10">
+    <span className="px-2 py-1 text-xs font-mono bg-white/5 text-[#e4e4e7] rounded-lg border border-white/10">
       {type}
     </span>
   );
@@ -57,6 +53,7 @@ export function PurchaseIntentList({
 }: PurchaseIntentListProps) {
   // credential modal state
   const [credentialModalOpen, setCredentialModalOpen] = useState(false);
+  const [verifyingIntent, setVerifyingIntent] = useState(false);
   const [fetchingIntent, setFetchingIntent] = useState(false);
   const [selectedIntent, setSelectedIntent] = useState<any>(null);
 
@@ -64,16 +61,22 @@ export function PurchaseIntentList({
   const { fetchPurchaseIntent } = usePurchaseIntents(jwt);
 
   const handleVerifyIntent = async (intent: any) => {
+    setVerifyingIntent(true);
+
     try {
       const result = await verifyPurchaseIntent(
         process.env.NEXT_PUBLIC_PROJECT_ID || "",
         intent.id
       );
 
+      setVerifyingIntent(false);
+
       // refresh list to reflect new verified status
       onRefresh?.();
     } catch (error) {
       console.error(error);
+    } finally {
+      setVerifyingIntent(false);
     }
   };
 
@@ -153,8 +156,9 @@ export function PurchaseIntentList({
               {intent.status === "verify" && (
                 <button
                   onClick={() => handleVerifyIntent(intent)}
+                  disabled={verifyingIntent}
                   className={
-                    "px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 flex items-center gap-1 bg-[#bff660] text-[#131316] hover:bg-[#b2f63d] hover:-translate-y-0.5"
+                    "bg-yellow-500 px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 flex items-center gap-1 bg-[#bff660] text-[#131316] hover:bg-[#b2f63d] hover:-translate-y-0.5"
                   }
                 >
                   <span>Verify Intent</span>
@@ -165,21 +169,8 @@ export function PurchaseIntentList({
                 <button
                   onClick={() => handleGetPurchaseIntent(intent)}
                   disabled={fetchingIntent}
-                  className="px-3 py-1.5 bg-green-500 text-white text-xs font-medium rounded-lg hover:bg-green-600 transition-all duration-200 hover:-translate-y-0.5 flex items-center gap-1 disabled:opacity-50"
+                  className="px-3 py-1.5 bg-[#bff660] text-[#131316] text-xs font-medium rounded-lg hover:bg-[#b2f63d] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 flex items-center gap-1"
                 >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                    />
-                  </svg>
                   <span>
                     {fetchingIntent ? "Loading..." : "Get Credential"}
                   </span>

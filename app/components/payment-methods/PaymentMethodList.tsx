@@ -33,7 +33,7 @@ function CardBadge({ brand, type }: { brand: string; type: string }) {
       )} flex items-center gap-1`}
     >
       {typeof icon === "string" ? <span>{icon}</span> : icon}
-      <span>{type?.toUpperCase() ?? "CREDIT"}</span>
+      <span>{type?.toUpperCase()} CARD</span>
     </span>
   );
 }
@@ -94,15 +94,16 @@ export function PaymentMethodList({
             {/* Info */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-2">
-                <CardBadge brand={method.card.brand} type={method.card.type} />
                 <div className="font-mono text-sm text-[#f4f4f5]">
-                  {method.card.details.bin} •••• {method.card.details.last4}
+                  {method.card.details.bin}••••{method.card.details.last4}
                 </div>
                 <div className="font-mono text-sm text-[#f4f4f5]">
                   {String(method.card.details.expirationMonth).padStart(2, "0")}
                   /{String(method.card.details.expirationYear).slice(-2)}
                 </div>
+                <CardBadge brand={method.card.brand} type={method.card.type} />
               </div>
+
 
               <div className="flex items-center gap-4 text-xs text-[#a1a1aa]">
                 <div className="flex items-center gap-1">
@@ -110,9 +111,9 @@ export function PaymentMethodList({
                   <span className="font-mono text-[#bff660]">{method.id}</span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span>Credentials:</span>
-                  <span className="text-[#bff660]">
-                    {method.credentialTypes.join(", ")}
+                  <span>Available Credentials:</span>
+                  <span className="text-[#fff]">
+                    [ {method.credentialTypes.join(", ")} ]
                   </span>
                 </div>
               </div>
