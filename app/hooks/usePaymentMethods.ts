@@ -1,24 +1,72 @@
 import { useState, useEffect } from "react";
 import { APIService } from "../services/apiService";
 
-export function usePaymentMethods(jwt: string | null) {
+/**
+ * Use Payment Methods Hook
+ */
+export function usePaymentMethods(jwt: string | undefined) {
   const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  /**
+   * Fetch payment methods
+   * @returns List of payment methods
+   */
   const fetchPaymentMethods = async () => {
     if (!jwt) return;
-    
-    setLoading(true);
+
+    setFetching(true);
     setError(null);
-    
+
     try {
       const data = await APIService.fetchPaymentMethods(jwt);
       setPaymentMethods(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred while fetching payment methods"
+      );
     } finally {
-      setLoading(false);
+      setFetching(false);
+    }
+  };
+
+  /**
+   * Create a payment method
+   *
+   * @param cardData The card data to create the payment method with
+   * @returns The created payment method
+   */
+  const createPaymentMethod = async (cardData: {
+    cardNumber: string;
+    expirationMonth: string;
+    expirationYear: string;
+    cvc: string;
+  }) => {
+    if (!jwt) return;
+    
+    setCreating(true);
+    setError(null);
+    
+    try {
+      const data = await APIService.createPaymentMethod(jwt, cardData);
+
+      // Refresh the list to show the new payment method
+      await fetchPaymentMethods();
+      
+      return data;
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An error occurred while creating payment method"
+      );
+      throw err;
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -30,9 +78,11 @@ export function usePaymentMethods(jwt: string | null) {
   }, [jwt]);
 
   return {
+    createPaymentMethod,
+    fetchPaymentMethods,
     paymentMethods,
-    loading,
+    fetching,
+    creating,
     error,
-    refresh: fetchPaymentMethods,
   };
 }

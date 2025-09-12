@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { APIService } from "../../services/apiService";
-import { copyToClipboard } from "../../utils";
+import { copyToClipboard } from "../../shared/utils";
 import { JWTDisplayCard } from "./JWTDisplayCard";
 
 interface AuthenticationTabProps {

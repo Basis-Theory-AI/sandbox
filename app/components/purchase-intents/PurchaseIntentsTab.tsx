@@ -5,20 +5,11 @@ import { usePurchaseIntents } from "../../hooks/usePurchaseIntents";
 
 interface PurchaseIntentsTabProps {
   privateJWT: string;
-  paymentMethods: any[];
-  onVerificationStarted: (intentId: string) => void;
-  onVerificationCompleted: (intentId: string, result: any) => void;
-  onError: (error: string) => void;
 }
 
-export function PurchaseIntentsTab({
-  privateJWT,
-  paymentMethods,
-  onVerificationStarted,
-  onVerificationCompleted,
-  onError,
-}: PurchaseIntentsTabProps) {
-  const { refresh, purchaseIntents, loading } = usePurchaseIntents(privateJWT);
+export function PurchaseIntentsTab({ privateJWT }: PurchaseIntentsTabProps) {
+  const { fetchPurchaseIntents, purchaseIntents, fetching } =
+    usePurchaseIntents(privateJWT);
 
   return (
     <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl p-6">
@@ -27,7 +18,7 @@ export function PurchaseIntentsTab({
           Purchase Intents
         </h2>
         <button
-          onClick={refresh}
+          onClick={fetchPurchaseIntents}
           disabled={!privateJWT}
           className="px-3 py-1.5 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -43,14 +34,10 @@ export function PurchaseIntentsTab({
         </div>
       ) : (
         <PurchaseIntentList
-          purchaseIntents={purchaseIntents}
-          paymentMethods={paymentMethods}
-          onRefresh={refresh}
-          loading={loading}
-          onVerificationStarted={onVerificationStarted}
-          onVerificationCompleted={onVerificationCompleted}
-          onError={onError}
           jwt={privateJWT}
+          purchaseIntents={purchaseIntents}
+          onRefresh={fetchPurchaseIntents}
+          loading={fetching}
         />
       )}
     </div>

@@ -1,44 +1,20 @@
 import React, { useState } from "react";
-import { copyToClipboard } from "../../utils";
-
-interface Credential {
-  type: "virtual-card" | "network-token";
-}
-
-interface CardCredential extends Credential {
-  type: "virtual-card";
-  number: string;
-  expirationMonth: string;
-  expirationYear: string;
-  cvc: string;
-}
-
-interface NetworkTokenCredential extends Credential {
-  type: "network-token";
-  brand: string;
-  tokenData?: any;
-  networkToken?: any;
-  retrievedAt: string;
-  intentId: string;
-  credentialType: string;
-}
+import { copyToClipboard } from "../../shared/utils";
 
 interface PurchaseIntentCredentialModalProps {
   isOpen: boolean;
   onClose: () => void;
-  credential: Credential | null;
-  purchaseIntentId: string;
+  intent: any | null;
 }
 
 export function PurchaseIntentCredentialModal({
   isOpen,
   onClose,
-  credential,
-  purchaseIntentId,
+  intent,
 }: PurchaseIntentCredentialModalProps) {
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
-  if (!isOpen || !credential) return null;
+  if (!isOpen || !intent) return null;
 
   const handleCopy = (text: string, field: string) => {
     copyToClipboard(text);
@@ -56,14 +32,14 @@ export function PurchaseIntentCredentialModal({
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-lg font-semibold text-[#f4f4f5]">
-              {credential.type === "network-token"
+              {intent.credentialType === "network-token"
                 ? "Network Token Details"
-                : credential.type === "virtual-card"
+                : intent.credentialType === "virtual-card"
                 ? "Virtual Card Details"
                 : "Unknown Credential"}
             </h2>
             <p className="text-xs text-[#a1a1aa] font-mono">
-              Intent: {purchaseIntentId.substring(0, 8)}...
+              Intent: {intent.id}
             </p>
           </div>
           <button
@@ -87,11 +63,8 @@ export function PurchaseIntentCredentialModal({
         </div>
 
         <div className="space-y-4">
-          {credential.type === "network-token" &&
+          {intent.credentialType === "network-token" &&
             (() => {
-              const tokenDetails = credential as NetworkTokenCredential;
-              const tokenData =
-                tokenDetails.tokenData || tokenDetails.networkToken;
               return (
                 <>
                   {/* Number */}
@@ -101,15 +74,15 @@ export function PurchaseIntentCredentialModal({
                     </label>
                     <div className="flex gap-2">
                       <div className="flex-1 bg-black/30 rounded-lg p-3 font-mono text-sm text-[#bff660] border border-white/10">
-                        {tokenData?.number
-                          ? formatCardNumber(tokenData.number)
+                        {intent?.token?.number
+                          ? formatCardNumber(intent?.token?.number)
                           : "N/A"}
                       </div>
                       <button
                         onClick={() =>
-                          handleCopy(tokenData?.number || "", "number")
+                          handleCopy(intent?.token?.number || "", "number")
                         }
-                        disabled={!tokenData?.number}
+                        disabled={!intent?.token?.number}
                         className="px-3 py-2 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
                       >
                         {copiedField === "number" ? "✓" : "Copy"}
@@ -124,22 +97,23 @@ export function PurchaseIntentCredentialModal({
                     </label>
                     <div className="flex gap-2">
                       <div className="flex-1 bg-black/30 rounded-lg p-3 font-mono text-sm text-[#bff660] border border-white/10">
-                        {tokenData?.expirationMonth && tokenData?.expirationYear
-                          ? `${tokenData.expirationMonth}/${tokenData.expirationYear}`
+                        {intent?.token?.expirationMonth &&
+                        intent?.token?.expirationYear
+                          ? `${intent?.token?.expirationMonth}/${intent?.token?.expirationYear}`
                           : "N/A"}
                       </div>
                       <button
                         onClick={() =>
                           handleCopy(
-                            `${tokenData?.expirationMonth || ""}/${
-                              tokenData?.expirationYear || ""
+                            `${intent?.token?.expirationMonth || ""}/${
+                              intent?.token?.expirationYear || ""
                             }`,
                             "expiration"
                           )
                         }
                         disabled={
-                          !tokenData?.expirationMonth ||
-                          !tokenData?.expirationYear
+                          !intent?.token?.expirationMonth ||
+                          !intent?.token?.expirationYear
                         }
                         className="px-3 py-2 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
                       >
@@ -155,13 +129,16 @@ export function PurchaseIntentCredentialModal({
                     </label>
                     <div className="flex gap-2">
                       <div className="flex-1 bg-black/30 rounded-lg p-3 font-mono text-sm text-[#bff660] border border-white/10">
-                        {tokenData?.cryptogram || "N/A"}
+                        {intent?.token?.cryptogram || "N/A"}
                       </div>
                       <button
                         onClick={() =>
-                          handleCopy(tokenData?.cryptogram || "", "cryptogram")
+                          handleCopy(
+                            intent?.token?.cryptogram || "",
+                            "cryptogram"
+                          )
                         }
-                        disabled={!tokenData?.cryptogram}
+                        disabled={!intent?.token?.cryptogram}
                         className="px-3 py-2 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
                       >
                         {copiedField === "cryptogram" ? "✓" : "Copy"}
@@ -170,17 +147,17 @@ export function PurchaseIntentCredentialModal({
                   </div>
 
                   {/* ECI (when available) */}
-                  {tokenData?.eci && (
+                  {intent?.token?.eci && (
                     <div>
                       <label className="block text-xs font-medium text-[#a1a1aa] mb-2">
                         ECI
                       </label>
                       <div className="flex gap-2">
                         <div className="flex-1 bg-black/30 rounded-lg p-3 font-mono text-sm text-[#bff660] border border-white/10">
-                          {tokenData.eci}
+                          {intent?.token?.eci}
                         </div>
                         <button
-                          onClick={() => handleCopy(tokenData.eci, "eci")}
+                          onClick={() => handleCopy(intent?.token?.eci, "eci")}
                           className="px-3 py-2 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 hover:-translate-y-0.5"
                         >
                           {copiedField === "eci" ? "✓" : "Copy"}
@@ -192,9 +169,8 @@ export function PurchaseIntentCredentialModal({
               );
             })()}
 
-          {credential.type === "virtual-card" &&
+          {intent.credentialType === "virtual-card" &&
             (() => {
-              const cardInfo = credential as CardCredential;
               return (
                 <>
                   {/* Card Number */}
@@ -204,10 +180,12 @@ export function PurchaseIntentCredentialModal({
                     </label>
                     <div className="flex gap-2">
                       <div className="flex-1 bg-black/30 rounded-lg p-3 font-mono text-sm text-[#bff660] border border-white/10">
-                        {formatCardNumber(cardInfo.number)}
+                        {formatCardNumber(intent?.card?.number)}
                       </div>
                       <button
-                        onClick={() => handleCopy(cardInfo.number, "number")}
+                        onClick={() =>
+                          handleCopy(intent?.card?.number, "number")
+                        }
                         className="px-3 py-2 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 hover:-translate-y-0.5"
                       >
                         {copiedField === "number" ? "✓" : "Copy"}
@@ -222,12 +200,13 @@ export function PurchaseIntentCredentialModal({
                     </label>
                     <div className="flex gap-2">
                       <div className="flex-1 bg-black/30 rounded-lg p-3 font-mono text-sm text-[#bff660] border border-white/10">
-                        {cardInfo.expirationMonth}/{cardInfo.expirationYear}
+                        {intent?.card?.expirationMonth}/
+                        {intent?.card?.expirationYear}
                       </div>
                       <button
                         onClick={() =>
                           handleCopy(
-                            `${cardInfo.expirationMonth}/${cardInfo.expirationYear}`,
+                            `${intent?.card?.expirationMonth}/${intent?.card?.expirationYear}`,
                             "expiration"
                           )
                         }
@@ -245,10 +224,10 @@ export function PurchaseIntentCredentialModal({
                     </label>
                     <div className="flex gap-2">
                       <div className="flex-1 bg-black/30 rounded-lg p-3 font-mono text-sm text-[#bff660] border border-white/10">
-                        {cardInfo.cvc}
+                        {intent?.card?.cvc}
                       </div>
                       <button
-                        onClick={() => handleCopy(cardInfo.cvc, "cvc")}
+                        onClick={() => handleCopy(intent?.card?.cvc, "cvc")}
                         className="px-3 py-2 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 hover:-translate-y-0.5"
                       >
                         {copiedField === "cvc" ? "✓" : "Copy"}
@@ -273,15 +252,15 @@ export function PurchaseIntentCredentialModal({
         {/* Security Notice */}
         <div
           className={`mt-4 p-3 rounded-lg ${
-            credential.type === "network-token"
+            intent.credentialType === "network-token"
               ? "bg-purple-500/10 border border-purple-500/20"
-              : credential.type === "virtual-card"
+              : intent.credentialType === "virtual-card"
               ? "bg-blue-500/10 border border-blue-500/20"
               : "bg-yellow-500/10 border border-yellow-500/20"
           }`}
         >
           <div className="flex items-start gap-2">
-            {credential.type === "network-token" ? (
+            {intent.credentialType === "network-token" ? (
               <svg
                 className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0"
                 fill="none"
@@ -295,7 +274,7 @@ export function PurchaseIntentCredentialModal({
                   d="M15 7a2 2 0 012 2m0 0a2 2 0 012 2 2 2 0 01-2 2 2 2 0 01-2-2 2 2 0 012-2zM9 7a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2V9a2 2 0 00-2-2H9z"
                 />
               </svg>
-            ) : credential.type === "virtual-card" ? (
+            ) : intent.credentialType === "virtual-card" ? (
               <svg
                 className="w-4 h-4 text-yellow-500 mt-0.5 flex-shrink-0"
                 fill="none"
@@ -315,31 +294,31 @@ export function PurchaseIntentCredentialModal({
             <div>
               <p
                 className={`text-xs font-medium ${
-                  credential.type === "network-token"
+                  intent.credentialType === "network-token"
                     ? "text-purple-400"
-                    : credential.type === "virtual-card"
+                    : intent.type === "virtual-card"
                     ? "text-blue-400"
                     : "text-yellow-400"
                 }`}
               >
-                {credential.type === "network-token"
+                {intent.credentialType === "network-token"
                   ? "Network Token"
-                  : credential.type === "virtual-card"
+                  : intent.credentialType === "virtual-card"
                   ? "Visa Credentials"
                   : "Virtual Card"}
               </p>
               <p
                 className={`text-xs ${
-                  credential.type === "network-token"
+                  intent.credentialType === "network-token"
                     ? "text-purple-300"
-                    : credential.type === "virtual-card"
+                    : intent.type === "virtual-card"
                     ? "text-blue-300"
                     : "text-yellow-300"
                 }`}
               >
-                {credential.type === "network-token"
+                {intent.credentialType === "network-token"
                   ? "This is a network token provided directly by the card network for secure transactions."
-                  : credential.type === "virtual-card"
+                  : intent.credentialType === "virtual-card"
                   ? "Tokenized card credentials secured by Visa for transaction processing."
                   : "This is a temporary virtual card for secure transactions only."}
               </p>

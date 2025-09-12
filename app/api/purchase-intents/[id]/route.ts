@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateJWT, getJWTConfig } from '../../../../services/jwtService'
-import { BtAiApiService } from '../../../../services/btAiApiService'
+import { generateJWT, getJWTConfig } from '../../../services/jwtService'
+import { BtAiApiService } from '../../../services/btAiApiService'
 
 // GET - Fetch Purchase Intent Details with Card Info
 export async function GET(

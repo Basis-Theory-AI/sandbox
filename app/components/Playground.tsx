@@ -6,8 +6,6 @@ import { BtAiLogo } from "./shared/BtAiLogo";
 import { AuthenticationTab } from "./authentication/AuthenticationTab";
 import { PaymentMethodsTab } from "./payment-methods/PaymentMethodsTab";
 import { PurchaseIntentsTab } from "./purchase-intents/PurchaseIntentsTab";
-import { usePaymentMethods } from "../hooks/usePaymentMethods";
-import { usePurchaseIntents } from "../hooks/usePurchaseIntents";
 
 interface PlaygroundProps {
   initialJWT: string;

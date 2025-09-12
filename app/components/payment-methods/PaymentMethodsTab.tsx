@@ -15,10 +15,17 @@ export function PaymentMethodsTab({
   privateJWT,
 }: PaymentMethodsTabProps) {
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const { paymentMethods, loading, refresh } = usePaymentMethods(privateJWT);
+  const { paymentMethods, fetching, fetchPaymentMethods } =
+    usePaymentMethods(privateJWT);
 
   const handlePaymentMethodCreated = () => {
-    refresh();
+    fetchPaymentMethods();
+    setCreateModalOpen(false);
+  };
+
+  const handlePaymentMethodCreationError = (error: any) => {
+    // TODO: ERROR SNACKBAR
+    console.error(error);
     setCreateModalOpen(false);
   };
 
@@ -38,7 +45,7 @@ export function PaymentMethodsTab({
               Create Payment Method
             </button>
             <button
-              onClick={refresh}
+              onClick={fetchPaymentMethods}
               disabled={!privateJWT}
               className="px-3 py-1.5 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -50,15 +57,15 @@ export function PaymentMethodsTab({
           <div className="text-center py-8 text-[#a1a1aa]">
             <p className="mb-2">Generate JWTs in the Authentication Tab</p>
             <p className="text-sm">
-              Private JWT is required to fetch payment methods
+              Private JWT is required to fetch Payment Methods
             </p>
           </div>
         ) : (
           <PaymentMethodList
             jwt={privateJWT}
             paymentMethods={paymentMethods}
-            onRefresh={refresh}
-            loading={loading}
+            onRefresh={fetchPaymentMethods}
+            fetching={fetching}
           />
         )}
       </div>
@@ -69,6 +76,7 @@ export function PaymentMethodsTab({
         isOpen={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
         onPaymentMethodCreated={handlePaymentMethodCreated}
+        onCreateError={handlePaymentMethodCreationError}
       />
     </>
   );
