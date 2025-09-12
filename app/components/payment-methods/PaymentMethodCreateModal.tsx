@@ -116,7 +116,7 @@ export function PaymentMethodCreateModal({
                 onClick={() => fillTestCard(key as CardBrand)}
                 className={`p-4 rounded-xl font-semibold transition-all duration-200 hover:scale-105 hover:-translate-y-1 border ${
                   selectedBrand === key
-                    ? "bg-[#bff660]/10 border-[#bff660] text-[#bff660]"
+                    ? "bg-[#B5F200]/10 border-[#B5F200] text-[#B5F200]"
                     : "bg-white/5 border-white/10 text-[#e4e4e7] hover:bg-white/10 hover:border-white/20"
                 }`}
               >
@@ -190,9 +190,9 @@ export function PaymentMethodCreateModal({
             <button
               onClick={handleCreatePaymentMethod}
               disabled={creating}
-              className={`w-full p-4 rounded-xl font-semibold transition-all duration-200 ${
+              className={`w-full h-8 rounded-lg font-medium font-sans text-sm transition-all duration-200 flex items-center justify-center ${
                 formData.cardNumber
-                  ? "bg-[#bff660] text-[#131316] hover:bg-[#b2f63d] hover:-translate-y-1"
+                  ? "bg-[#B5F200] text-[#131316] hover:bg-[#A3E600] hover:-translate-y-1"
                   : "bg-white/5 text-[#a1a1aa] border border-white/10 cursor-not-allowed"
               } ${creating ? "opacity-75" : ""}`}
             >

@@ -32,7 +32,7 @@ export function Playground({ initialJWT }: PlaygroundProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#050506] text-[#f4f4f5] font-['Inter',sans-serif]">
+    <div className="min-h-screen bg-[#050506] text-[#f4f4f5] font-sans">
       {/* Header */}
       <div className="border-b border-white/10 bg-[#0D0D0F] backdrop-blur max-h-16">
         <div className="max-w-6xl mx-auto px-6 py-3 h-16 flex items-center justify-between">
@@ -45,7 +45,7 @@ export function Playground({ initialJWT }: PlaygroundProps) {
             <div className="flex items-center gap-2">
               <div
                 className={`w-2 h-2 rounded-full ${
-                  visaStatus ? "bg-[#bff660]" : "bg-yellow-500"
+                  visaStatus ? "bg-[#B5F200]" : "bg-yellow-500"
                 }`}
               ></div>
               <span className="text-xs font-medium text-[#e4e4e7]">
@@ -55,7 +55,7 @@ export function Playground({ initialJWT }: PlaygroundProps) {
             <div className="flex items-center gap-2">
               <div
                 className={`w-2 h-2 rounded-full ${
-                  mastercardStatus ? "bg-[#bff660]" : "bg-yellow-500"
+                  mastercardStatus ? "bg-[#B5F200]" : "bg-yellow-500"
                 }`}
               ></div>
               <span className="text-xs font-medium text-[#e4e4e7]">
@@ -75,7 +75,7 @@ export function Playground({ initialJWT }: PlaygroundProps) {
               onClick={() => setActiveTab("authentication")}
               className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-lg ${
                 activeTab === "authentication"
-                  ? "bg-[#bff660] text-[#131316]"
+                  ? "bg-[#B5F200] text-[#131316]"
                   : "text-[#a1a1aa] hover:text-[#e4e4e7]"
               }`}
             >
@@ -85,7 +85,7 @@ export function Playground({ initialJWT }: PlaygroundProps) {
               onClick={() => setActiveTab("payment-methods")}
               className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-lg ${
                 activeTab === "payment-methods"
-                  ? "bg-[#bff660] text-[#131316]"
+                  ? "bg-[#B5F200] text-[#131316]"
                   : "text-[#a1a1aa] hover:text-[#e4e4e7]"
               }`}
             >
@@ -95,7 +95,7 @@ export function Playground({ initialJWT }: PlaygroundProps) {
               onClick={() => setActiveTab("purchase-intents")}
               className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-lg ${
                 activeTab === "purchase-intents"
-                  ? "bg-[#bff660] text-[#131316]"
+                  ? "bg-[#B5F200] text-[#131316]"
                   : "text-[#a1a1aa] hover:text-[#e4e4e7]"
               }`}
             >

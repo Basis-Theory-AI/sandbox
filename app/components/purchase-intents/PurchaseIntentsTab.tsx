@@ -20,7 +20,7 @@ export function PurchaseIntentsTab({ privateJWT }: PurchaseIntentsTabProps) {
         <button
           onClick={fetchPurchaseIntents}
           disabled={!privateJWT}
-          className="px-3 py-1.5 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-3 h-8 bg-white/10 text-[#e4e4e7] text-sm font-medium font-sans rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
         >
           Refresh
         </button>

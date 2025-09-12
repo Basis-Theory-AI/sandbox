@@ -33,14 +33,14 @@ export function JWTDisplayCard({
           <button
             onClick={onGenerate}
             disabled={isCreating}
-            className="px-3 py-1.5 bg-[#bff660] text-[#131316] text-xs font-medium rounded-lg hover:bg-[#b2f63d] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50"
+            className="px-3 h-8 bg-[#B5F200] text-[#131316] text-sm font-medium font-sans rounded-lg hover:bg-[#A3E600] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 flex items-center"
           >
             {isCreating ? "Creating..." : "Create New"}
           </button>
           {jwt && (
             <button
               onClick={onCopy}
-              className="px-3 py-1.5 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 hover:-translate-y-0.5"
+              className="px-3 h-8 bg-white/10 text-[#e4e4e7] text-sm font-medium font-sans rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 hover:-translate-y-0.5 flex items-center"
             >
               {copied ? "✓ Copied!" : "Copy"}
             </button>

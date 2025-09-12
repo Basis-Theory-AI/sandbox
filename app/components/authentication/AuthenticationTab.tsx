@@ -94,7 +94,7 @@ export function AuthenticationTab({ onJWTsChanged }: AuthenticationTabProps) {
               type="text"
               value={entityId}
               onChange={(e) => setEntityId(e.target.value)}
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-[#e4e4e7] text-sm font-mono focus:outline-none focus:border-[#bff660] focus:bg-white/8"
+              className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-[#e4e4e7] text-sm font-mono focus:outline-none focus:border-[#B5F200] focus:bg-white/8"
               placeholder="user123"
             />
           </div>

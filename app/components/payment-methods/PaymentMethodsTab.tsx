@@ -49,20 +49,20 @@ export function PaymentMethodsTab({
                 Payment Methods
               </h1>
               <p className="text-base text-[#a1a1aa]">
-                Manage your stored payment methods and create purchase intents
+                Manage and Create Payment Methods
               </p>
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => setCreateModalOpen(true)}
                 disabled={!publicJWT}
-                className="px-4 py-2 bg-[#bff660] text-[#131316] text-sm font-medium rounded-lg hover:bg-[#b2f63d] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 h-8 bg-[#B5F200] text-[#131316] text-sm font-medium font-sans rounded-lg hover:bg-[#A3E600] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
               >
                 Create
               </button>
               <button
                 onClick={fetchPaymentMethods}
-                className="px-3 py-1.5 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200"
+                className="px-3 h-8 bg-white/10 text-[#e4e4e7] text-sm font-medium font-sans rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 flex items-center"
               >
                 Refresh
               </button>

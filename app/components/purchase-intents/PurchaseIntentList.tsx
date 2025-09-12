@@ -100,7 +100,7 @@ export function PurchaseIntentList({
     return (
       <div className="flex items-center justify-center py-8">
         <div className="flex items-center gap-3 text-[#a1a1aa]">
-          <div className="w-5 h-5 border-2 border-[#a1a1aa] border-t-[#bff660] rounded-full animate-spin"></div>
+          <div className="w-5 h-5 border-2 border-[#a1a1aa] border-t-[#B5F200] rounded-full animate-spin"></div>
           <span className="text-sm">Loading Purchase Intents...</span>
         </div>
       </div>
@@ -115,7 +115,7 @@ export function PurchaseIntentList({
         </div>
         <button
           onClick={onRefresh}
-          className="px-3 py-1.5 bg-white/10 text-[#e4e4e7] text-xs font-medium rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200"
+          className="px-3 h-8 bg-white/10 text-[#e4e4e7] text-sm font-medium font-sans rounded-lg border border-white/20 hover:bg-white/15 transition-all duration-200 flex items-center"
         >
           Refresh
         </button>
@@ -158,7 +158,7 @@ export function PurchaseIntentList({
                   onClick={() => handleVerifyIntent(intent)}
                   disabled={verifyingIntent}
                   className={
-                    "bg-yellow-500 px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 flex items-center gap-1 bg-[#bff660] text-[#131316] hover:bg-[#b2f63d] hover:-translate-y-0.5"
+                    "bg-yellow-500 px-3 h-8 text-sm font-medium font-sans rounded-lg transition-all duration-200 flex items-center gap-1 bg-[#B5F200] text-[#131316] hover:bg-[#A3E600] hover:-translate-y-0.5"
                   }
                 >
                   <span>Verify Intent</span>
@@ -169,7 +169,7 @@ export function PurchaseIntentList({
                 <button
                   onClick={() => handleGetPurchaseIntent(intent)}
                   disabled={fetchingIntent}
-                  className="px-3 py-1.5 bg-[#bff660] text-[#131316] text-xs font-medium rounded-lg hover:bg-[#b2f63d] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 flex items-center gap-1"
+                  className="px-3 h-8 bg-[#B5F200] text-[#131316] text-sm font-medium font-sans rounded-lg hover:bg-[#A3E600] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 flex items-center gap-1"
                 >
                   <span>
                     {fetchingIntent ? "Loading..." : "Get Credential"}
