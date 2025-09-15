@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { APIService } from "../../services/apiService";
 import { copyToClipboard } from "../../shared/utils";
 import { JWTDisplayCard } from "./JWTDisplayCard";
+import { useSnackbar } from "../../hooks/useSnackbar";
 
 interface AuthenticationTabProps {
   onJWTsChanged: (publicJWT: string, privateJWT: string) => void;
@@ -17,6 +18,7 @@ export function AuthenticationTab({ onJWTsChanged }: AuthenticationTabProps) {
   const [isCreatingPrivate, setIsCreatingPrivate] = useState(false);
   const [copiedPublic, setCopiedPublic] = useState(false);
   const [copiedPrivate, setCopiedPrivate] = useState(false);
+  const { showSuccess, showError } = useSnackbar();
 
   const generateJWT = async (role: "public" | "private") => {
     const setter =
@@ -28,13 +30,15 @@ export function AuthenticationTab({ onJWTsChanged }: AuthenticationTabProps) {
 
       if (role === "public") {
         setPublicJWT(jwt);
+        showSuccess("Public JWT Generated", "New public JWT created successfully.");
       } else if (role === "private") {
         setPrivateJWT(jwt);
+        showSuccess("Private JWT Generated", "New private JWT created successfully.");
       } else {
         throw new Error(`Invalid role: ${role}`);
       }
     } catch (error) {
-      console.error(`Failed to generate ${role} JWT:`, error);
+      showError("JWT Generation Failed", `Failed to generate ${role} JWT: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setter(false);
     }
@@ -61,7 +65,7 @@ export function AuthenticationTab({ onJWTsChanged }: AuthenticationTabProps) {
         setPrivateJWT(privateToken);
         onJWTsChanged(publicToken, privateToken);
       } catch (error) {
-        console.error("Failed to initialize JWTs:", error);
+        showError("JWT Initialization Failed", error instanceof Error ? error.message : String(error));
       }
     };
 
@@ -75,12 +79,14 @@ export function AuthenticationTab({ onJWTsChanged }: AuthenticationTabProps) {
   const handlePublicCopy = async () => {
     await copyToClipboard(publicJWT);
     setCopiedPublic(true);
+    showSuccess("Public JWT Copied", "JWT copied to clipboard.");
     setTimeout(() => setCopiedPublic(false), 2000);
   };
 
   const handlePrivateCopy = async () => {
     await copyToClipboard(privateJWT);
     setCopiedPrivate(true);
+    showSuccess("Private JWT Copied", "JWT copied to clipboard.");
     setTimeout(() => setCopiedPrivate(false), 2000);
   };
 

@@ -1,13 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { getCardIcon } from "../shared/CardIcons";
-import { usePurchaseIntents } from "../../hooks/usePurchaseIntents";
 import { ShoppingCartIcon } from "../shared/icons/ShoppingCartIcon";
+import { CreatePurchaseIntentModal } from "../purchase-intents/CreatePurchaseIntentModal";
 
 interface PaymentMethodListProps {
   jwt?: string;
   paymentMethods: any[];
   onRefresh?: () => void;
   fetching?: boolean;
+  onPurchaseIntentCreated?: (intent: any) => void;
+  onError?: (error: string) => void;
 }
 
 function CardBadge({ brand, type }: { brand: string; type: string }) {
@@ -29,17 +31,27 @@ export function PaymentMethodList({
   paymentMethods,
   onRefresh,
   fetching,
+  onPurchaseIntentCreated,
+  onError,
 }: PaymentMethodListProps) {
-  const { createPurchaseIntent, creating } = usePurchaseIntents(jwt);
+  const [createIntentModalOpen, setCreateIntentModalOpen] = useState(false);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<any>(null);
 
-  const handleCreatePurchaseIntent = async (paymentMethod: any) => {
-    try {
-      const result = await createPurchaseIntent(paymentMethod);
-      // TODO: SUCCESS SNACKBAR
-    } catch (error) {
-      // TODO: ERROR SNACKBAR
-      console.error(error);
-    }
+  const handleCreatePurchaseIntent = (paymentMethod: any) => {
+    setSelectedPaymentMethod(paymentMethod);
+    setCreateIntentModalOpen(true);
+  };
+
+  const handlePurchaseIntentCreated = (intent: any) => {
+    onPurchaseIntentCreated?.(intent);
+    setCreateIntentModalOpen(false);
+    setSelectedPaymentMethod(null);
+  };
+
+  const handleCreateError = (error: string) => {
+    onError?.(error);
+    setCreateIntentModalOpen(false);
+    setSelectedPaymentMethod(null);
   };
 
   if (fetching) {
@@ -151,16 +163,11 @@ export function PaymentMethodList({
                 <td className="px-4 py-3 align-middle">
                   <button
                     onClick={() => handleCreatePurchaseIntent(method)}
-                    disabled={creating}
-                    className="w-8 h-8 rounded-lg hover:bg-opacity-20 transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 flex items-center justify-center"
+                    className="w-8 h-8 rounded-lg hover:bg-opacity-20 transition-all duration-200 hover:-translate-y-0.5 flex items-center justify-center"
                     style={{ backgroundColor: "rgba(181, 242, 0, 0.1)" }}
                     title="Create Purchase Intent"
                   >
-                    {creating ? (
-                      <div className="w-4 h-4 border border-[#C7FB20] border-t-transparent rounded-full animate-spin"></div>
-                    ) : (
-                      <ShoppingCartIcon className="w-4 h-4" fill="#C7FB20" />
-                    )}
+                    <ShoppingCartIcon className="w-4 h-4" fill="#C7FB20" />
                   </button>
                 </td>
               </tr>
@@ -168,6 +175,19 @@ export function PaymentMethodList({
           </tbody>
         </table>
       </div>
+
+      {/* Create Purchase Intent Modal */}
+      <CreatePurchaseIntentModal
+        paymentMethod={selectedPaymentMethod}
+        isOpen={createIntentModalOpen}
+        onClose={() => {
+          setCreateIntentModalOpen(false);
+          setSelectedPaymentMethod(null);
+        }}
+        onPurchaseIntentCreated={handlePurchaseIntentCreated}
+        onCreateError={handleCreateError}
+        jwt={jwt}
+      />
     </>
   );
 }

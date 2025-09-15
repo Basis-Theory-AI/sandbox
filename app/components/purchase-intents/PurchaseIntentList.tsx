@@ -4,6 +4,7 @@ import { useBtAi } from "@basis-theory-ai/react";
 import { usePurchaseIntents } from "../../hooks/usePurchaseIntents";
 import { KeyIcon } from "../shared/icons/KeyIcon";
 import { CreditCardIcon } from "../shared/icons/CreditCardIcon";
+import { useSnackbar } from "../../hooks/useSnackbar";
 
 interface PurchaseIntentListProps {
   jwt?: string;
@@ -73,6 +74,7 @@ export function PurchaseIntentList({
   const [selectedIntent, setSelectedIntent] = useState<any>(null);
 
   const { verifyPurchaseIntent } = useBtAi();
+  const { showSuccess, showError } = useSnackbar();
   const { fetchPurchaseIntent } = usePurchaseIntents(jwt);
 
   const handleVerifyIntent = async (intent: any) => {
@@ -88,8 +90,15 @@ export function PurchaseIntentList({
 
       // refresh list to reflect new verified status
       onRefresh?.();
+      showSuccess(
+        "Intent Verified",
+        `Purchase intent ${intent.id} verified successfully.`
+      );
     } catch (error) {
-      console.error(error);
+      showError(
+        "Verification Failed",
+        error instanceof Error ? error.message : String(error)
+      );
     } finally {
       setVerifyingIntent(false);
     }
@@ -105,7 +114,10 @@ export function PurchaseIntentList({
       setFetchingIntent(false);
       setCredentialModalOpen(true);
     } catch (error) {
-      console.error(error);
+      showError(
+        "Failed to Load Intent",
+        error instanceof Error ? error.message : String(error)
+      );
     } finally {
       setFetchingIntent(false);
     }

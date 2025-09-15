@@ -4,28 +4,34 @@ import { PaymentMethodList } from "./PaymentMethodList";
 import { PaymentMethodCreateModal } from "./PaymentMethodCreateModal";
 import { usePaymentMethods } from "../../hooks/usePaymentMethods";
 import { useState } from "react";
+import { useSnackbar } from "../../hooks/useSnackbar";
 
 interface PaymentMethodsTabProps {
   publicJWT: string;
   privateJWT: string;
+  onPurchaseIntentCreated?: (intent: any) => void;
+  onError?: (error: string) => void;
 }
 
 export function PaymentMethodsTab({
   publicJWT,
   privateJWT,
+  onPurchaseIntentCreated,
+  onError,
 }: PaymentMethodsTabProps) {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const { paymentMethods, fetching, fetchPaymentMethods } =
     usePaymentMethods(privateJWT);
+  const { showSuccess, showError } = useSnackbar();
 
   const handlePaymentMethodCreated = () => {
+    showSuccess("Payment Method Created", "Payment method created successfully.");
     fetchPaymentMethods();
     setCreateModalOpen(false);
   };
 
   const handlePaymentMethodCreationError = (error: any) => {
-    // TODO: ERROR SNACKBAR
-    console.error(error);
+    showError("Payment Method Creation Failed", error.message || error);
     setCreateModalOpen(false);
   };
 
@@ -73,6 +79,8 @@ export function PaymentMethodsTab({
             paymentMethods={paymentMethods}
             onRefresh={fetchPaymentMethods}
             fetching={fetching}
+            onPurchaseIntentCreated={onPurchaseIntentCreated}
+            onError={onError}
           />
         </div>
       )}

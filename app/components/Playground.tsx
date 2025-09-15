@@ -9,6 +9,7 @@ import { PurchaseIntentsTab } from "./purchase-intents/PurchaseIntentsTab";
 import { KeyIcon } from "./shared/icons/KeyIcon";
 import { CreditCardIcon } from "./shared/icons/CreditCardIcon";
 import { ShoppingCartIcon } from "./shared/icons/ShoppingCartIcon";
+import { useSnackbar } from "../hooks/useSnackbar";
 
 interface PlaygroundProps {
   initialJWT: string;
@@ -24,6 +25,7 @@ export function Playground({ initialJWT }: PlaygroundProps) {
   const [privateJWT, setPrivateJWT] = useState("");
 
   const { getStatus, updateJwt } = useBtAi();
+  const { showSuccess, showError } = useSnackbar();
   const visaStatus = getStatus().visa;
   const mastercardStatus = getStatus().mastercard;
 
@@ -32,6 +34,14 @@ export function Playground({ initialJWT }: PlaygroundProps) {
     setPrivateJWT(privateToken);
 
     updateJwt(publicToken);
+  };
+
+  const handlePurchaseIntentCreated = (intent: any) => {
+    showSuccess("Purchase Intent Created", `Intent ${intent.id} created successfully`);
+  };
+
+  const handleError = (error: string) => {
+    showError("Error", error);
   };
 
   return (
@@ -142,7 +152,12 @@ export function Playground({ initialJWT }: PlaygroundProps) {
         )}
 
         {activeTab === "payment-methods" && (
-          <PaymentMethodsTab publicJWT={publicJWT} privateJWT={privateJWT} />
+          <PaymentMethodsTab 
+            publicJWT={publicJWT} 
+            privateJWT={privateJWT}
+            onPurchaseIntentCreated={handlePurchaseIntentCreated}
+            onError={handleError}
+          />
         )}
 
         {activeTab === "purchase-intents" && (
