@@ -6,6 +6,9 @@ import { BtAiLogo } from "./shared/BtAiLogo";
 import { AuthenticationTab } from "./authentication/AuthenticationTab";
 import { PaymentMethodsTab } from "./payment-methods/PaymentMethodsTab";
 import { PurchaseIntentsTab } from "./purchase-intents/PurchaseIntentsTab";
+import { KeyIcon } from "./shared/icons/KeyIcon";
+import { CreditCardIcon } from "./shared/icons/CreditCardIcon";
+import { ShoppingCartIcon } from "./shared/icons/ShoppingCartIcon";
 
 interface PlaygroundProps {
   initialJWT: string;
@@ -73,32 +76,59 @@ export function Playground({ initialJWT }: PlaygroundProps) {
           <div className="flex gap-6 items-center">
             <button
               onClick={() => setActiveTab("authentication")}
-              className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-lg ${
+              className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-lg flex items-center gap-2 ${
                 activeTab === "authentication"
-                  ? "bg-[#B5F200] text-[#131316]"
-                  : "text-[#a1a1aa] hover:text-[#e4e4e7]"
+                  ? "text-[#C7FB20]"
+                  : "text-[#A1A1A9] hover:text-[#e4e4e7]"
               }`}
+              style={
+                activeTab === "authentication"
+                  ? { backgroundColor: "rgba(181, 242, 0, 0.1)" }
+                  : {}
+              }
             >
+              <KeyIcon 
+                className="w-4 h-4" 
+                fill={activeTab === "authentication" ? "#C7FB20" : "#A1A1A9"} 
+              />
               Authentication
             </button>
             <button
               onClick={() => setActiveTab("payment-methods")}
-              className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-lg ${
+              className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-lg flex items-center gap-2 ${
                 activeTab === "payment-methods"
-                  ? "bg-[#B5F200] text-[#131316]"
-                  : "text-[#a1a1aa] hover:text-[#e4e4e7]"
+                  ? "text-[#C7FB20]"
+                  : "text-[#A1A1A9] hover:text-[#e4e4e7]"
               }`}
+              style={
+                activeTab === "payment-methods"
+                  ? { backgroundColor: "rgba(181, 242, 0, 0.1)" }
+                  : {}
+              }
             >
+              <CreditCardIcon 
+                className="w-4 h-4" 
+                fill={activeTab === "payment-methods" ? "#C7FB20" : "#A1A1A9"} 
+              />
               Payment Methods
             </button>
             <button
               onClick={() => setActiveTab("purchase-intents")}
-              className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-lg ${
+              className={`px-3 py-1.5 text-sm font-medium transition-all duration-200 rounded-lg flex items-center gap-2 ${
                 activeTab === "purchase-intents"
-                  ? "bg-[#B5F200] text-[#131316]"
-                  : "text-[#a1a1aa] hover:text-[#e4e4e7]"
+                  ? "text-[#C7FB20]"
+                  : "text-[#A1A1A9] hover:text-[#e4e4e7]"
               }`}
+              style={
+                activeTab === "purchase-intents"
+                  ? { backgroundColor: "rgba(181, 242, 0, 0.1)" }
+                  : {}
+              }
             >
+              <ShoppingCartIcon 
+                className="w-4 h-4" 
+                fill={activeTab === "purchase-intents" ? "#C7FB20" : "#A1A1A9"} 
+              />
               Purchase Intents
             </button>
           </div>
