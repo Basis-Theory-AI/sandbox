@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { TEST_CARDS } from "../../shared/constants";
 import { usePaymentMethods } from "../../hooks/usePaymentMethods";
+import { getCardIcon } from "../shared/CardIcons";
 
 interface PaymentMethodCreateModalProps {
   jwt?: string;
@@ -33,7 +34,7 @@ export function PaymentMethodCreateModal({
 
   if (!isOpen) return null;
 
-  // Auto-fill form with test card data
+  // auto-fill form with test card data
   const fillTestCard = (brand: CardBrand) => {
     const testCard = TEST_CARDS[brand];
 
@@ -49,8 +50,13 @@ export function PaymentMethodCreateModal({
 
   // Create payment method using hook
   const handleCreatePaymentMethod = async () => {
-    if (!formData.cardNumber) {
-      onCreateError?.("Please select a test card first");
+    if (
+      !formData.cardNumber ||
+      !formData.expirationMonth ||
+      !formData.expirationYear ||
+      !formData.cvc
+    ) {
+      onCreateError?.("Please fill in all card details");
       return;
     }
 
@@ -77,59 +83,49 @@ export function PaymentMethodCreateModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-[#131316] border border-white/10 rounded-xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-[#f4f4f5]">
+      <div
+        className="border border-white/10 rounded-xl p-6 max-h-[80vh] overflow-y-auto"
+        style={{ width: "600px", backgroundColor: "rgba(13, 13, 15, 1)" }}
+      >
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold text-[#f4f4f5] mb-1">
             Create Payment Method
           </h2>
-          <button
-            onClick={onClose}
-            className="text-[#a1a1aa] hover:text-[#e4e4e7] transition-colors"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+          <p className="text-base text-[#a1a1aa]">
+            Select a Test Card or enter card details manually
+          </p>
         </div>
 
         {/* Payment Method Creator Content */}
-        <div className="max-w-md mx-auto">
-          <div className="text-center mb-6">
-            <p className="text-[#a1a1aa] text-sm">Select a Test Card</p>
-          </div>
-
-          {/* Test Card Buttons */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
+        <div>
+          {/* Test Card Buttons - Vertical Stack */}
+          <div className="space-y-3 mb-6">
             {Object.entries(TEST_CARDS).map(([key, card]) => (
               <button
                 key={key}
                 onClick={() => fillTestCard(key as CardBrand)}
-                className={`p-4 rounded-xl font-semibold transition-all duration-200 hover:scale-105 hover:-translate-y-1 border ${
+                className={`w-full p-4 rounded-lg border transition-all duration-200 hover:border-white/20 ${
                   selectedBrand === key
-                    ? "bg-[#B5F200]/10 border-[#B5F200] text-[#B5F200]"
-                    : "bg-white/5 border-white/10 text-[#e4e4e7] hover:bg-white/10 hover:border-white/20"
+                    ? "bg-[#B5F200]/10 border-[#B5F200]"
+                    : "bg-white/5 border-white/10 hover:bg-white/10"
                 }`}
               >
-                <div className="flex items-center justify-center mb-2">
-                  TODO
+                <div className="flex items-center gap-4">
+                  <div className="flex-shrink-0">{getCardIcon(key)}</div>
+                  <div className="flex items-center gap-3 font-mono text-sm text-[#f4f4f5]">
+                    <span>•••• {card.number.slice(-4)}</span>
+                    <span>12/28</span>
+                    <span>123</span>
+                  </div>
                 </div>
-                <div className="text-sm">Test {key.toUpperCase()}</div>
               </button>
             ))}
           </div>
 
-          {/* Card Form - Read Only */}
-          <div className="space-y-4 mb-6">
+          <div className="border-t border-white/10"></div>
+
+          {/* Card Form - Editable */}
+          <div className="space-y-4 mt-6 mb-6">
             <div>
               <label className="block text-sm font-medium text-[#e4e4e7] mb-2">
                 Card Number
@@ -137,9 +133,12 @@ export function PaymentMethodCreateModal({
               <input
                 type="text"
                 value={formData.cardNumber}
-                readOnly
-                placeholder="Select a test card above"
-                className="w-full px-4 py-3 border border-white/10 rounded-lg bg-white/5 text-[#a1a1aa] cursor-not-allowed font-mono text-sm"
+                onChange={(e) => {
+                  setFormData({ ...formData, cardNumber: e.target.value });
+                  setSelectedBrand(null); // Unselect test card when typing
+                }}
+                placeholder="4622 9431 2312 1270"
+                className="w-full px-4 py-3 border border-white/10 rounded-lg bg-white/5 text-[#f4f4f5] font-mono text-sm focus:outline-none focus:border-[#B5F200] focus:bg-white/8"
               />
             </div>
 
@@ -151,9 +150,15 @@ export function PaymentMethodCreateModal({
                 <input
                   type="text"
                   value={formData.expirationMonth}
-                  readOnly
-                  placeholder="--"
-                  className="w-full px-3 py-3 border border-white/10 rounded-lg bg-white/5 text-[#a1a1aa] cursor-not-allowed font-mono text-sm"
+                  onChange={(e) => {
+                    setFormData({
+                      ...formData,
+                      expirationMonth: e.target.value,
+                    });
+                    setSelectedBrand(null); // Unselect test card when typing
+                  }}
+                  placeholder="12"
+                  className="w-full px-3 py-3 border border-white/10 rounded-lg bg-white/5 text-[#f4f4f5] font-mono text-sm focus:outline-none focus:border-[#B5F200] focus:bg-white/8"
                 />
               </div>
 
@@ -164,9 +169,12 @@ export function PaymentMethodCreateModal({
                 <input
                   type="text"
                   value={formData.expirationYear}
-                  readOnly
-                  placeholder="----"
-                  className="w-full px-3 py-3 border border-white/10 rounded-lg bg-white/5 text-[#a1a1aa] cursor-not-allowed font-mono text-sm"
+                  onChange={(e) => {
+                    setFormData({ ...formData, expirationYear: e.target.value });
+                    setSelectedBrand(null); // Unselect test card when typing
+                  }}
+                  placeholder="2028"
+                  className="w-full px-3 py-3 border border-white/10 rounded-lg bg-white/5 text-[#f4f4f5] font-mono text-sm focus:outline-none focus:border-[#B5F200] focus:bg-white/8"
                 />
               </div>
 
@@ -177,40 +185,53 @@ export function PaymentMethodCreateModal({
                 <input
                   type="text"
                   value={formData.cvc}
-                  readOnly
-                  placeholder="---"
-                  className="w-full px-3 py-3 border border-white/10 rounded-lg bg-white/5 text-[#a1a1aa] cursor-not-allowed font-mono text-sm"
+                  onChange={(e) => {
+                    setFormData({ ...formData, cvc: e.target.value });
+                    setSelectedBrand(null); // Unselect test card when typing
+                  }}
+                  placeholder="123"
+                  className="w-full px-3 py-3 border border-white/10 rounded-lg bg-white/5 text-[#f4f4f5] font-mono text-sm focus:outline-none focus:border-[#B5F200] focus:bg-white/8"
                 />
               </div>
             </div>
           </div>
 
-          {/* Create Button */}
-          <div className="space-y-4">
+          {/* Action Buttons */}
+          <div className="space-y-3">
             <button
               onClick={handleCreatePaymentMethod}
-              disabled={creating}
-              className={`w-full h-8 rounded-lg font-medium font-sans text-sm transition-all duration-200 flex items-center justify-center ${
-                formData.cardNumber
+              disabled={
+                creating ||
+                !formData.cardNumber ||
+                !formData.expirationMonth ||
+                !formData.expirationYear ||
+                !formData.cvc
+              }
+              className={`w-full h-10 rounded-lg font-medium font-sans text-sm transition-all duration-200 flex items-center justify-center ${
+                formData.cardNumber &&
+                formData.expirationMonth &&
+                formData.expirationYear &&
+                formData.cvc
                   ? "bg-[#B5F200] text-[#131316] hover:bg-[#A3E600] hover:-translate-y-1"
                   : "bg-white/5 text-[#a1a1aa] border border-white/10 cursor-not-allowed"
               } ${creating ? "opacity-75" : ""}`}
             >
               {creating ? (
-                <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-[#131316] border-t-transparent mr-2"></div>
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#131316] border-t-transparent mr-2"></div>
                   Creating Payment Method...
-                </div>
-              ) : formData.cardNumber ? (
-                <div className="flex items-center justify-center gap-2">
-                  <span>Create Payment Method</span>
-                </div>
+                </>
               ) : (
-                <div className="flex items-center justify-center gap-2">
-                  <span>💳</span>
-                  <span>Select Test Card Above</span>
-                </div>
+                "Create Payment Method"
               )}
+            </button>
+            
+            <button
+              onClick={onClose}
+              disabled={creating}
+              className="w-full h-10 rounded-lg font-medium font-sans text-sm transition-all duration-200 flex items-center justify-center bg-white/10 text-[#e4e4e7] border border-white/20 hover:bg-white/15 hover:border-white/30 disabled:opacity-50"
+            >
+              Cancel
             </button>
           </div>
         </div>
