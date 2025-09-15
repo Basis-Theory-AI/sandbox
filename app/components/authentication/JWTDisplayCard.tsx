@@ -25,36 +25,40 @@ export function JWTDisplayCard({
 }: JWTDisplayCardProps) {
   return (
     <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl overflow-hidden">
-      {/* Header */}
       <div className="bg-[#0D0D0F] px-6 py-4">
         <h3 className="text-base font-semibold text-[#f4f4f5] mb-1">{title}</h3>
         <p className="text-xs text-[#a1a1aa]">{description}</p>
       </div>
-      
-      {/* Divider */}
+
       <div className="border-t border-white/10"></div>
-      
-      {/* JWT Content */}
+
       <div className="bg-[#0D0D0F] px-6 py-4">
         {jwt ? (
           <>
-            <div className="rounded-lg py-4 px-2 font-mono text-xs text-white overflow-hidden mb-3" style={{ backgroundColor: 'rgba(23, 23, 26, 1)' }}>
+            <div
+              className="rounded-lg py-4 px-2 font-mono text-xs text-white overflow-hidden mb-3"
+              style={{ backgroundColor: "rgba(23, 23, 26, 1)" }}
+            >
               <div className="break-all">{jwt}</div>
             </div>
             <JSONDisplay data={decodeJWT(jwt)} />
           </>
         ) : (
-          <div className="rounded-lg py-4 px-2 text-xs text-[#a1a1aa] text-center" style={{ backgroundColor: 'rgba(23, 23, 26, 1)' }}>
+          <div
+            className="rounded-lg py-4 px-2 text-xs text-[#a1a1aa] text-center"
+            style={{ backgroundColor: "rgba(23, 23, 26, 1)" }}
+          >
             Click "Create New" to generate a {role} JWT
           </div>
         )}
       </div>
-      
-      {/* Divider */}
+
       <div className="border-t border-white/10"></div>
-      
-      {/* Footer */}
-      <div className="px-6 py-4" style={{ backgroundColor: 'rgba(23, 23, 26, 1)' }}>
+
+      <div
+        className="px-6 py-4"
+        style={{ backgroundColor: "rgba(23, 23, 26, 1)" }}
+      >
         <div className="flex justify-end gap-2">
           <button
             onClick={onGenerate}

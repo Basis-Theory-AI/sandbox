@@ -10,7 +10,6 @@ interface PaymentMethodListProps {
   fetching?: boolean;
 }
 
-// Card Type Badge - teal pill with icon + card type
 function CardBadge({ brand, type }: { brand: string; type: string }) {
   const icon = getCardIcon(brand);
 
@@ -72,7 +71,6 @@ export function PaymentMethodList({
 
   return (
     <>
-      {/* Payment Methods Table */}
       <div className="overflow-hidden rounded-lg border border-white/10">
         <table className="w-full">
           <thead>

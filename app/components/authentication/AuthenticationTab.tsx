@@ -109,7 +109,6 @@ export function AuthenticationTab({ onJWTsChanged }: AuthenticationTabProps) {
       <div className="space-y-6">
         {/* Entity Configuration */}
         <div className="bg-white/5 backdrop-blur border border-white/10 rounded-xl overflow-hidden">
-          {/* Header */}
           <div className="bg-[#0D0D0F] px-6 py-4">
             <h3 className="text-base font-semibold text-[#f4f4f5] mb-1">
               Entity Configuration
@@ -119,10 +118,8 @@ export function AuthenticationTab({ onJWTsChanged }: AuthenticationTabProps) {
             </p>
           </div>
 
-          {/* Divider */}
           <div className="border-t border-white/10"></div>
 
-          {/* Content */}
           <div className="bg-[#0D0D0F] px-6 py-4">
             <div className="flex gap-3">
               <div className="flex-1">
@@ -140,10 +137,8 @@ export function AuthenticationTab({ onJWTsChanged }: AuthenticationTabProps) {
             </div>
           </div>
 
-          {/* Divider */}
           <div className="border-t border-white/10"></div>
 
-          {/* Footer */}
           <div
             className="px-6 py-4"
             style={{ backgroundColor: "rgba(23, 23, 26, 1)" }}

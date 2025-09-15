@@ -12,7 +12,7 @@ interface PurchaseIntentListProps {
   loading?: boolean;
 }
 
-// Status badge component
+// status badge component
 function StatusBadge({ status }: { status: string }) {
   const getStatusStyle = (status: string) => {
     switch (status.toLowerCase()) {
@@ -51,7 +51,7 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-// Credential type badge
+// credential type badge
 function CredentialTypeBadge({ type }: { type: string }) {
   return (
     <span className="px-3 h-6 bg-[#212124] text-[#A1A1A9] text-sm font-medium rounded-xl flex items-center w-fit">

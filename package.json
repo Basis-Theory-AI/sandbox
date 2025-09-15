@@ -1,11 +1,13 @@
 {
-  "name": "basis-theory-ai-sandbox",
+  "name": "btai-playground",
   "private": true,
   "version": "1.0.0",
-  "description": "Sandbox for demonstrating the Basis Theory AI platform",
+  "description": "Playground for demonstrating the BT AI platform",
   "keywords": [
     "basis-theory",
+    "btai",
     "ai",
+    "playground",
     "sandbox",
     "agent",
     "agentic-commerce",
@@ -17,9 +19,15 @@
     "nextjs",
     "payments",
     "jwt",
-    "authentication"
+    "authentication",
+    "visa",
+    "mastercard",
+    "amex",
+    "american-express",
+    "discover",
+    "network-tokens"
   ],
-  "author": "Basis Theory AI",
+  "author": "BT AI",
   "repository": {
     "type": "git",
     "url": "https://github.com/Basis-Theory-AI/sandbox"

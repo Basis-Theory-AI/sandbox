@@ -28,8 +28,8 @@ export function PaymentMethodCreateModal({
     expirationYear: "",
     cvc: "",
   });
-
   const [selectedBrand, setSelectedBrand] = useState<CardBrand | null>(null);
+
   const { createPaymentMethod, creating } = usePaymentMethods(jwt);
 
   if (!isOpen) return null;
@@ -48,7 +48,6 @@ export function PaymentMethodCreateModal({
     setSelectedBrand(brand);
   };
 
-  // Create payment method using hook
   const handleCreatePaymentMethod = async () => {
     if (
       !formData.cardNumber ||
@@ -96,9 +95,8 @@ export function PaymentMethodCreateModal({
           </p>
         </div>
 
-        {/* Payment Method Creator Content */}
         <div>
-          {/* Test Card Buttons - Vertical Stack */}
+          {/* Test Card Buttons */}
           <div className="space-y-3 mb-6">
             {Object.entries(TEST_CARDS).map(([key, card]) => (
               <button
@@ -124,7 +122,7 @@ export function PaymentMethodCreateModal({
 
           <div className="border-t border-white/10"></div>
 
-          {/* Card Form - Editable */}
+          {/* Card Form */}
           <div className="space-y-4 mt-6 mb-6">
             <div>
               <label className="block text-sm font-medium text-[#e4e4e7] mb-2">
@@ -135,9 +133,9 @@ export function PaymentMethodCreateModal({
                 value={formData.cardNumber}
                 onChange={(e) => {
                   setFormData({ ...formData, cardNumber: e.target.value });
-                  setSelectedBrand(null); // Unselect test card when typing
+                  setSelectedBrand(null);
                 }}
-                placeholder="4622 9431 2312 1270"
+                placeholder="---- ---- ---- ----"
                 className="w-full px-4 py-3 border border-white/10 rounded-lg bg-white/5 text-[#f4f4f5] font-mono text-sm focus:outline-none focus:border-[#B5F200] focus:bg-white/8"
               />
             </div>
@@ -155,9 +153,9 @@ export function PaymentMethodCreateModal({
                       ...formData,
                       expirationMonth: e.target.value,
                     });
-                    setSelectedBrand(null); // Unselect test card when typing
+                    setSelectedBrand(null);
                   }}
-                  placeholder="12"
+                  placeholder="--"
                   className="w-full px-3 py-3 border border-white/10 rounded-lg bg-white/5 text-[#f4f4f5] font-mono text-sm focus:outline-none focus:border-[#B5F200] focus:bg-white/8"
                 />
               </div>
@@ -170,10 +168,13 @@ export function PaymentMethodCreateModal({
                   type="text"
                   value={formData.expirationYear}
                   onChange={(e) => {
-                    setFormData({ ...formData, expirationYear: e.target.value });
-                    setSelectedBrand(null); // Unselect test card when typing
+                    setFormData({
+                      ...formData,
+                      expirationYear: e.target.value,
+                    });
+                    setSelectedBrand(null);
                   }}
-                  placeholder="2028"
+                  placeholder="----"
                   className="w-full px-3 py-3 border border-white/10 rounded-lg bg-white/5 text-[#f4f4f5] font-mono text-sm focus:outline-none focus:border-[#B5F200] focus:bg-white/8"
                 />
               </div>
@@ -187,9 +188,9 @@ export function PaymentMethodCreateModal({
                   value={formData.cvc}
                   onChange={(e) => {
                     setFormData({ ...formData, cvc: e.target.value });
-                    setSelectedBrand(null); // Unselect test card when typing
+                    setSelectedBrand(null);
                   }}
-                  placeholder="123"
+                  placeholder="---"
                   className="w-full px-3 py-3 border border-white/10 rounded-lg bg-white/5 text-[#f4f4f5] font-mono text-sm focus:outline-none focus:border-[#B5F200] focus:bg-white/8"
                 />
               </div>
@@ -225,7 +226,7 @@ export function PaymentMethodCreateModal({
                 "Create Payment Method"
               )}
             </button>
-            
+
             <button
               onClick={onClose}
               disabled={creating}

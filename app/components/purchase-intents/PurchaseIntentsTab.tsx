@@ -32,7 +32,7 @@ export function PurchaseIntentsTab({ privateJWT }: PurchaseIntentsTabProps) {
                 Purchase Intents
               </h1>
               <p className="text-base text-[#a1a1aa]">
-                Manage purchase intents and fetch credentials
+                Manage Purchase Intents and Fetch Credentials
               </p>
             </div>
             <div className="flex gap-2">
