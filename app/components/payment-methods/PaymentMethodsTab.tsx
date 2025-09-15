@@ -42,8 +42,7 @@ export function PaymentMethodsTab({
         </div>
       ) : (
         <div className="py-8">
-          {/* Title, Subtitle and Actions */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-12">
             <div>
               <h1 className="text-2xl font-semibold text-[#f4f4f5] mb-2">
                 Payment Methods
@@ -68,6 +67,7 @@ export function PaymentMethodsTab({
               </button>
             </div>
           </div>
+
           <PaymentMethodList
             jwt={privateJWT}
             paymentMethods={paymentMethods}

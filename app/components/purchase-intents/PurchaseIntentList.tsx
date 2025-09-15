@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { PurchaseIntentCredentialModal } from "./PurchaseIntentCredentialModal";
 import { useBtAi } from "@basis-theory-ai/react";
 import { usePurchaseIntents } from "../../hooks/usePurchaseIntents";
+import { KeyIcon } from "../shared/icons/KeyIcon";
+import { CreditCardIcon } from "../shared/icons/CreditCardIcon";
 
 interface PurchaseIntentListProps {
   jwt?: string;
@@ -12,24 +14,37 @@ interface PurchaseIntentListProps {
 
 // Status badge component
 function StatusBadge({ status }: { status: string }) {
-  const getStatusColor = (status: string) => {
+  const getStatusStyle = (status: string) => {
     switch (status.toLowerCase()) {
       case "verify":
-        return "bg-yellow-500/10 text-yellow-400 border-yellow-500/20";
+        return {
+          backgroundColor: "rgba(249, 115, 22, 0.1)",
+          color: "rgba(253, 186, 116, 1)",
+        };
       case "active":
-        return "bg-green-500/10 text-green-400 border-green-500/20";
+        return {
+          backgroundColor: "rgba(16, 185, 129, 0.1)",
+          color: "rgba(110, 231, 183, 1)",
+        };
       case "expired":
-        return "bg-red-500/10 text-red-400 border-red-500/20";
+        return {
+          backgroundColor: "rgba(244, 63, 94, 0.1)",
+          color: "rgba(253, 164, 175, 1)",
+        };
       default:
-        return "bg-[#71717b]/10 text-[#e4e4e7] border-[#71717b]/20";
+        return {
+          backgroundColor: "#212124",
+          color: "#A1A1A9",
+        };
     }
   };
 
+  const style = getStatusStyle(status);
+
   return (
     <span
-      className={`px-2 py-1 text-xs font-medium rounded-lg border ${getStatusColor(
-        status
-      )}`}
+      className="px-3 h-6 text-sm font-medium rounded-xl flex items-center w-fit"
+      style={style}
     >
       {status.toUpperCase()}
     </span>
@@ -39,8 +54,8 @@ function StatusBadge({ status }: { status: string }) {
 // Credential type badge
 function CredentialTypeBadge({ type }: { type: string }) {
   return (
-    <span className="px-2 py-1 text-xs font-mono bg-white/5 text-[#e4e4e7] rounded-lg border border-white/10">
-      {type}
+    <span className="px-3 h-6 bg-[#212124] text-[#A1A1A9] text-sm font-medium rounded-xl flex items-center w-fit">
+      {type.toUpperCase()}
     </span>
   );
 }
@@ -64,7 +79,7 @@ export function PurchaseIntentList({
     setVerifyingIntent(true);
 
     try {
-      const result = await verifyPurchaseIntent(
+      await verifyPurchaseIntent(
         process.env.NEXT_PUBLIC_PROJECT_ID || "",
         intent.id
       );
@@ -124,64 +139,99 @@ export function PurchaseIntentList({
   }
 
   return (
-    <div className="space-y-3">
-      {purchaseIntents.map((intent) => (
-        <div
-          key={intent.id}
-          className="bg-white/5 backdrop-blur border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-all duration-200 group"
-        >
-          <div className="flex items-center justify-between">
-            {/* Left side - Main info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="font-mono text-sm text-[#f4f4f5]">
-                  {intent.id}
-                </div>
-                <CredentialTypeBadge type={intent.credentialType} />
-                <StatusBadge status={intent.status} />
-              </div>
-
-              <div className="flex items-center gap-4 text-xs text-[#a1a1aa]">
-                <div className="flex items-center gap-1">
-                  <span>Payment Method:</span>
-                  <span className="font-mono text-[#bff660]">
+    <>
+      <div className="overflow-hidden rounded-lg border border-white/10">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-transparent">
+              <th className="px-4 py-3 text-left text-xs text-[#717179] font-medium">
+                ID
+              </th>
+              <th className="px-4 py-3 text-left text-xs text-[#717179] font-medium">
+                Payment Method ID
+              </th>
+              <th className="px-4 py-3 text-left text-xs text-[#717179] font-medium">
+                Status
+              </th>
+              <th className="px-4 py-3 text-left text-xs text-[#717179] font-medium">
+                Credential Type
+              </th>
+              <th className="px-4 py-3 text-left text-xs text-[#717179] font-medium">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {purchaseIntents.map((intent) => (
+              <tr
+                key={intent.id}
+                className="h-12 bg-[#0D0D0FCC] hover:bg-white/5 transition-all duration-200 border-b border-white/5 last:border-b-0 cursor-pointer"
+              >
+                {/* ID */}
+                <td className="px-4 py-3">
+                  <span className="font-mono text-xs text-white">
+                    {intent.id}
+                  </span>
+                </td>
+                {/* Payment Method ID */}
+                <td className="px-4 py-3">
+                  <span className="font-mono text-xs text-white">
                     {intent.paymentMethodId}
                   </span>
-                </div>
-              </div>
-            </div>
+                </td>
+                {/* Status */}
+                <td className="px-4 py-3">
+                  <div className="inline-flex">
+                    <StatusBadge status={intent.status} />
+                  </div>
+                </td>
+                {/* Credential Type */}
+                <td className="px-4 py-3">
+                  <div className="inline-flex">
+                    <CredentialTypeBadge type={intent.credentialType} />
+                  </div>
+                </td>
+                {/* Actions */}
+                <td className="px-4 py-3 align-middle">
+                  <div className="flex gap-2">
+                    {intent.status === "verify" && (
+                      <button
+                        onClick={() => handleVerifyIntent(intent)}
+                        disabled={verifyingIntent}
+                        className="w-8 h-8 rounded-lg hover:bg-opacity-20 transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 flex items-center justify-center"
+                        style={{ backgroundColor: "rgba(249, 115, 22, 0.1)" }}
+                        title="Verify Intent"
+                      >
+                        <KeyIcon
+                          className="w-4 h-4"
+                          fill="rgba(253, 186, 116, 1)"
+                        />
+                      </button>
+                    )}
 
-            {/* Right side - Actions */}
-            <div className="flex items-center gap-2 ml-4">
-              {intent.status === "verify" && (
-                <button
-                  onClick={() => handleVerifyIntent(intent)}
-                  disabled={verifyingIntent}
-                  className={
-                    "bg-yellow-500 px-3 h-8 text-sm font-medium font-sans rounded-lg transition-all duration-200 flex items-center gap-1 bg-[#B5F200] text-[#131316] hover:bg-[#A3E600] hover:-translate-y-0.5"
-                  }
-                >
-                  <span>Verify Intent</span>
-                </button>
-              )}
+                    {intent.status === "active" && (
+                      <button
+                        onClick={() => handleGetPurchaseIntent(intent)}
+                        disabled={fetchingIntent}
+                        className="w-8 h-8 rounded-lg hover:bg-opacity-20 transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 flex items-center justify-center"
+                        style={{ backgroundColor: "rgba(181, 242, 0, 0.1)" }}
+                        title="Get Credential"
+                      >
+                        {fetchingIntent ? (
+                          <div className="w-4 h-4 border border-[#C7FB20] border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          <CreditCardIcon className="w-4 h-4" fill="#C7FB20" />
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-              {intent.status === "active" && (
-                <button
-                  onClick={() => handleGetPurchaseIntent(intent)}
-                  disabled={fetchingIntent}
-                  className="px-3 h-8 bg-[#B5F200] text-[#131316] text-sm font-medium font-sans rounded-lg hover:bg-[#A3E600] transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 flex items-center gap-1"
-                >
-                  <span>
-                    {fetchingIntent ? "Loading..." : "Get Credential"}
-                  </span>
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      ))}
-
-      {/* Card Details Modal */}
       <PurchaseIntentCredentialModal
         isOpen={credentialModalOpen}
         onClose={() => {
@@ -190,6 +240,6 @@ export function PurchaseIntentList({
         }}
         intent={selectedIntent}
       />
-    </div>
+    </>
   );
 }

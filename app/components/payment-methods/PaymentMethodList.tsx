@@ -1,6 +1,7 @@
 import React from "react";
 import { getCardIcon } from "../shared/CardIcons";
 import { usePurchaseIntents } from "../../hooks/usePurchaseIntents";
+import { ShoppingCartIcon } from "../shared/icons/ShoppingCartIcon";
 
 interface PaymentMethodListProps {
   jwt?: string;
@@ -86,10 +87,10 @@ export function PaymentMethodList({
                 Details
               </th>
               <th className="px-4 py-3 text-left text-xs text-[#717179] font-medium">
-                Created
+                Credential Types
               </th>
               <th className="px-4 py-3 text-left text-xs text-[#717179] font-medium">
-                Credential Types
+                Created Date
               </th>
               <th className="px-4 py-3 text-left text-xs text-[#717179] font-medium">
                 Actions
@@ -128,12 +129,7 @@ export function PaymentMethodList({
                     /{String(method.card.details.expirationYear).slice(-2)}
                   </span>
                 </td>
-                {/* Created */}
-                <td className="px-4 py-3">
-                  <span className="text-sm text-[#A1A1A9]">
-                    {new Date(method.createdAt).toLocaleDateString()}
-                  </span>
-                </td>
+
                 {/* Credentials Types */}
                 <td className="px-4 py-3">
                   <div className="flex gap-2">
@@ -142,26 +138,30 @@ export function PaymentMethodList({
                         key={credential}
                         className="h-6 px-3 bg-[#212124] text-[#A1A1A9] text-sm font-medium rounded-xl flex items-center"
                       >
-                        {credential}
+                        {credential.toUpperCase()}
                       </span>
                     ))}
                   </div>
+                </td>
+                {/* Created Date */}
+                <td className="px-4 py-3">
+                  <span className="text-sm text-[#A1A1A9]">
+                    {new Date(method.createdAt).toLocaleDateString()}
+                  </span>
                 </td>
                 {/* Actions */}
                 <td className="px-4 py-3 align-middle">
                   <button
                     onClick={() => handleCreatePurchaseIntent(method)}
                     disabled={creating}
-                    className="px-3 h-6 text-[#C7FB20] text-sm font-medium font-sans rounded-lg hover:bg-opacity-20 transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 flex items-center gap-1"
+                    className="w-8 h-8 rounded-lg hover:bg-opacity-20 transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 flex items-center justify-center"
                     style={{ backgroundColor: "rgba(181, 242, 0, 0.1)" }}
+                    title="Create Purchase Intent"
                   >
                     {creating ? (
-                      <>
-                        <div className="w-3 h-3 border border-[#C7FB20] border-t-transparent rounded-full animate-spin"></div>
-                        <span>Creating...</span>
-                      </>
+                      <div className="w-4 h-4 border border-[#C7FB20] border-t-transparent rounded-full animate-spin"></div>
                     ) : (
-                      <span>+ Intent</span>
+                      <ShoppingCartIcon className="w-4 h-4" fill="#C7FB20" />
                     )}
                   </button>
                 </td>
