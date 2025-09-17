@@ -1,7 +1,68 @@
 /**
+ * Pagination metadata from API response headers
+ */
+export interface PaginationInfo {
+  total: number;
+  limit: number;
+  offset: number;
+  hasNext: boolean;
+  hasPrevious: boolean;
+  currentPage: number;
+  totalPages: number;
+}
+
+/**
+ * Paginated response with data and pagination info
+ */
+export interface PaginatedResponse<T> {
+  data: T[];
+  pagination: PaginationInfo;
+}
+
+/**
  * Service for handling Next.js API operations
  */
 export class APIService {
+  /**
+   * Extract pagination info from response headers
+   */
+  private static extractPaginationInfo(response: Response): PaginationInfo {
+    // Try both case variations for headers (some servers normalize them)
+    const getHeader = (name: string): string | null => {
+      return response.headers.get(name) || 
+             response.headers.get(name.toLowerCase()) || 
+             response.headers.get(name.toUpperCase()) || 
+             null;
+    };
+
+    const totalHeader = getHeader('X-Total-Count');
+    const limitHeader = getHeader('X-Limit');
+    const offsetHeader = getHeader('X-Offset');
+    const hasNextHeader = getHeader('X-Has-Next');
+    const hasPreviousHeader = getHeader('X-Has-Previous');
+
+    const total = parseInt(totalHeader || '0');
+    const limit = parseInt(limitHeader || '10');
+    const offset = parseInt(offsetHeader || '0');
+    const hasNext = hasNextHeader === 'true';
+    const hasPrevious = hasPreviousHeader === 'true';
+    
+    const currentPage = Math.floor(offset / limit) + 1;
+    const totalPages = Math.ceil(total / limit);
+
+    const paginationInfo = {
+      total,
+      limit,
+      offset,
+      hasNext,
+      hasPrevious,
+      currentPage,
+      totalPages
+    };
+    
+    return paginationInfo;
+  }
+
   /**
    * Generate a new JWT token for specific entity and role
    *
@@ -87,6 +148,40 @@ export class APIService {
   }
 
   /**
+   * Fetch payment methods with pagination
+   *
+   * @param jwt - The JWT token for authentication
+   * @param limit - Number of items per page (default: 10)
+   * @param offset - Number of items to skip (default: 0)
+   * @returns Paginated payment methods response
+   */
+  static async fetchPaymentMethodsPaginated(
+    jwt: string, 
+    limit: number = 10, 
+    offset: number = 0
+  ): Promise<PaginatedResponse<any>> {
+    const url = `/api/payment-methods?limit=${limit}&offset=${offset}`;
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to fetch payment methods");
+    }
+
+    const pagination = this.extractPaginationInfo(response);
+
+    return {
+      data,
+      pagination
+    };
+  }
+
+  /**
    * Fetch purchase intents
    *
    * @param jwt - The JWT token for authentication
@@ -106,6 +201,40 @@ export class APIService {
     }
 
     return data;
+  }
+
+  /**
+   * Fetch purchase intents with pagination
+   *
+   * @param jwt - The JWT token for authentication
+   * @param limit - Number of items per page (default: 10)
+   * @param offset - Number of items to skip (default: 0)
+   * @returns Paginated purchase intents response
+   */
+  static async fetchPurchaseIntentsPaginated(
+    jwt: string, 
+    limit: number = 10, 
+    offset: number = 0
+  ): Promise<PaginatedResponse<any>> {
+    const url = `/api/purchase-intents?limit=${limit}&offset=${offset}`;
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to fetch purchase intents");
+    }
+
+    const pagination = this.extractPaginationInfo(response);
+
+    return {
+      data,
+      pagination
+    };
   }
 
   /**

@@ -30,16 +30,8 @@ export async function GET(
       jwt = await generateJWT(defaultUserId, config, ['private'])
     }
 
-    console.log('🔍 Fetching purchase intent details for:', id)
-
     // Call main API using service
     const responseData = await BtAiApiService.fetchPurchaseIntentDetails(jwt, id)
-
-    console.log('✅ Purchase intent details fetched successfully:', {
-      id: responseData.id,
-      status: responseData.status,
-      hasCard: !!responseData.card
-    })
 
     return NextResponse.json(responseData)
 

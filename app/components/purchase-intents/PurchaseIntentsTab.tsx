@@ -8,8 +8,16 @@ interface PurchaseIntentsTabProps {
 }
 
 export function PurchaseIntentsTab({ privateJWT }: PurchaseIntentsTabProps) {
-  const { fetchPurchaseIntents, purchaseIntents, fetching } =
-    usePurchaseIntents(privateJWT);
+  const {
+    fetchPurchaseIntents,
+    purchaseIntents,
+    fetching,
+    pagination,
+    currentPage,
+    pageSize,
+    goToPage,
+    changePageSize,
+  } = usePurchaseIntents(privateJWT);
 
   return (
     <>
@@ -49,6 +57,9 @@ export function PurchaseIntentsTab({ privateJWT }: PurchaseIntentsTabProps) {
             purchaseIntents={purchaseIntents}
             onRefresh={fetchPurchaseIntents}
             loading={fetching}
+            pagination={pagination}
+            onPageChange={goToPage}
+            onPageSizeChange={changePageSize}
           />
         </div>
       )}

@@ -5,12 +5,17 @@ import { usePurchaseIntents } from "../../hooks/usePurchaseIntents";
 import { KeyIcon } from "../shared/icons/KeyIcon";
 import { CreditCardIcon } from "../shared/icons/CreditCardIcon";
 import { useSnackbar } from "../../hooks/useSnackbar";
+import { Pagination } from "../shared/Pagination";
+import { PaginationInfo } from "../../services/apiService";
 
 interface PurchaseIntentListProps {
   jwt?: string;
   purchaseIntents: any[];
   onRefresh?: () => void;
   loading?: boolean;
+  pagination?: PaginationInfo | null;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
 }
 
 // status badge component
@@ -66,6 +71,9 @@ export function PurchaseIntentList({
   purchaseIntents,
   onRefresh,
   loading,
+  pagination,
+  onPageChange,
+  onPageSizeChange,
 }: PurchaseIntentListProps) {
   // credential modal state
   const [credentialModalOpen, setCredentialModalOpen] = useState(false);
@@ -243,6 +251,17 @@ export function PurchaseIntentList({
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {pagination && onPageChange && (
+        <div className="mt-6 px-4 py-3 bg-[#0D0D0FCC] rounded-lg border border-white/10">
+          <Pagination
+            pagination={pagination}
+            onPageChange={onPageChange}
+            onPageSizeChange={onPageSizeChange}
+          />
+        </div>
+      )}
 
       <PurchaseIntentCredentialModal
         isOpen={credentialModalOpen}

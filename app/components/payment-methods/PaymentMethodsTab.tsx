@@ -20,8 +20,16 @@ export function PaymentMethodsTab({
   onError,
 }: PaymentMethodsTabProps) {
   const [createModalOpen, setCreateModalOpen] = useState(false);
-  const { paymentMethods, fetching, fetchPaymentMethods } =
-    usePaymentMethods(privateJWT);
+  const {
+    paymentMethods,
+    fetching,
+    fetchPaymentMethods,
+    pagination,
+    currentPage,
+    pageSize,
+    goToPage,
+    changePageSize,
+  } = usePaymentMethods(privateJWT);
   const { showSuccess, showError } = useSnackbar();
 
   const handlePaymentMethodCreated = () => {
@@ -81,6 +89,9 @@ export function PaymentMethodsTab({
             fetching={fetching}
             onPurchaseIntentCreated={onPurchaseIntentCreated}
             onError={onError}
+            pagination={pagination}
+            onPageChange={goToPage}
+            onPageSizeChange={changePageSize}
           />
         </div>
       )}

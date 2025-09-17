@@ -56,6 +56,31 @@ export class BtAiApiService {
   }
 
   /**
+   * Fetch payment methods with pagination
+   * 
+   * @param jwt - The JWT token for authentication
+   * @param limit - Number of items per page
+   * @param offset - Number of items to skip
+   * @returns The list of payment methods and response with headers
+   */
+  static async fetchPaymentMethodsPaginated(jwt: string, limit: number = 10, offset: number = 0): Promise<{ data: any[], response: Response }> {
+    const response = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/payment-methods?limit=${limit}&offset=${offset}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${jwt}`
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to fetch payment methods');
+    }
+
+    return { data, response };
+  }
+
+  /**
    * Fetch a specific payment method
    */
   static async fetchPaymentMethod(jwt: string, paymentMethodId: string): Promise<any> {
@@ -115,6 +140,26 @@ export class BtAiApiService {
     }
 
     return data;
+  }
+
+  /**
+   * Fetch purchase intents with pagination
+   */
+  static async fetchPurchaseIntentsPaginated(jwt: string, limit: number = 10, offset: number = 0): Promise<{ data: any[], response: Response }> {
+    const response = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/purchase-intents?limit=${limit}&offset=${offset}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${jwt}`
+      }
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to fetch purchase intents');
+    }
+
+    return { data, response };
   }
 
   /**

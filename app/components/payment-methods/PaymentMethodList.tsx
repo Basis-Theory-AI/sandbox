@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { getCardIcon } from "../shared/CardIcons";
 import { ShoppingCartIcon } from "../shared/icons/ShoppingCartIcon";
 import { CreatePurchaseIntentModal } from "../purchase-intents/CreatePurchaseIntentModal";
+import { Pagination } from "../shared/Pagination";
+import { PaginationInfo } from "../../services/apiService";
 
 interface PaymentMethodListProps {
   jwt?: string;
@@ -10,15 +12,40 @@ interface PaymentMethodListProps {
   fetching?: boolean;
   onPurchaseIntentCreated?: (intent: any) => void;
   onError?: (error: string) => void;
+  pagination?: PaginationInfo | null;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
 }
 
 function CardBadge({ brand, type }: { brand: string; type: string }) {
   const icon = getCardIcon(brand);
 
+  // Color scheme based on card type
+  const getCardTypeStyle = (cardType: string) => {
+    switch (cardType?.toLowerCase()) {
+      case 'debit':
+        return {
+          textColor: '#A855F7', // purple-500
+          backgroundColor: 'rgba(168, 85, 247, 0.1)' // purple-500 with 10% opacity
+        };
+      case 'credit':
+      default:
+        return {
+          textColor: '#28D9D8', // cyan
+          backgroundColor: 'rgba(15, 187, 189, 0.1)' // cyan with 10% opacity
+        };
+    }
+  };
+
+  const style = getCardTypeStyle(type);
+
   return (
     <span
-      className="px-3 h-6 text-sm font-medium rounded-xl text-[#28D9D8] flex items-center gap-1 w-fit"
-      style={{ backgroundColor: "rgba(15, 187, 189, 0.1)" }}
+      className="px-3 h-6 text-sm font-medium rounded-xl flex items-center gap-1 w-fit"
+      style={{ 
+        color: style.textColor,
+        backgroundColor: style.backgroundColor 
+      }}
     >
       {typeof icon === "string" ? <span>{icon}</span> : icon}
       <span>{type?.toUpperCase()} CARD</span>
@@ -33,6 +60,9 @@ export function PaymentMethodList({
   fetching,
   onPurchaseIntentCreated,
   onError,
+  pagination,
+  onPageChange,
+  onPageSizeChange,
 }: PaymentMethodListProps) {
   const [createIntentModalOpen, setCreateIntentModalOpen] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<any>(null);
@@ -175,6 +205,17 @@ export function PaymentMethodList({
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {pagination && onPageChange && (
+        <div className="mt-6 px-4 py-3 bg-[#0D0D0FCC] rounded-lg border border-white/10">
+          <Pagination
+            pagination={pagination}
+            onPageChange={onPageChange}
+            onPageSizeChange={onPageSizeChange}
+          />
+        </div>
+      )}
 
       {/* Create Purchase Intent Modal */}
       <CreatePurchaseIntentModal

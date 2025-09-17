@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { APIService } from "../services/apiService";
+import { APIService, PaginationInfo, PaginatedResponse } from "../services/apiService";
 
 /**
  * Use Purchase Intents Hook
@@ -9,6 +9,9 @@ export function usePurchaseIntents(jwt: string | undefined) {
   const [fetching, setFetching] = useState(false);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pagination, setPagination] = useState<PaginationInfo | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   /**
    * Fetch purchase intents
@@ -21,8 +24,10 @@ export function usePurchaseIntents(jwt: string | undefined) {
     setError(null);
 
     try {
-      const data = await APIService.fetchPurchaseIntents(jwt);
-      setPurchaseIntents(data);
+      const offset = (currentPage - 1) * pageSize;
+      const result = await APIService.fetchPurchaseIntentsPaginated(jwt, pageSize, offset);
+      setPurchaseIntents(result.data);
+      setPagination(result.pagination);
     } catch (err) {
       setError(
         err instanceof Error
@@ -32,6 +37,21 @@ export function usePurchaseIntents(jwt: string | undefined) {
     } finally {
       setFetching(false);
     }
+  };
+
+  /**
+   * Change page
+   */
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  /**
+   * Change page size
+   */
+  const changePageSize = (size: number) => {
+    setPageSize(size);
+    setCurrentPage(1); // Reset to first page when changing page size
   };
 
   /**
@@ -99,12 +119,12 @@ export function usePurchaseIntents(jwt: string | undefined) {
     }
   };
 
-  // auto-fetch when jwt changes
+  // auto-fetch when jwt, currentPage, or pageSize changes
   useEffect(() => {
     if (jwt) {
       fetchPurchaseIntents();
     }
-  }, [jwt]);
+  }, [jwt, currentPage, pageSize]);
 
   return {
     createPurchaseIntent,
@@ -114,5 +134,10 @@ export function usePurchaseIntents(jwt: string | undefined) {
     fetching,
     creating,
     error,
+    pagination,
+    currentPage,
+    pageSize,
+    goToPage,
+    changePageSize,
   };
 }

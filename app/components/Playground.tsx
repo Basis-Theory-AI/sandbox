@@ -37,7 +37,10 @@ export function Playground({ initialJWT }: PlaygroundProps) {
   };
 
   const handlePurchaseIntentCreated = (intent: any) => {
-    showSuccess("Purchase Intent Created", `Intent ${intent.id} created successfully`);
+    showSuccess(
+      "Purchase Intent Created",
+      `Intent created successfully`
+    );
   };
 
   const handleError = (error: string) => {
@@ -97,9 +100,9 @@ export function Playground({ initialJWT }: PlaygroundProps) {
                   : {}
               }
             >
-              <KeyIcon 
-                className="w-4 h-4" 
-                fill={activeTab === "authentication" ? "#C7FB20" : "#A1A1A9"} 
+              <KeyIcon
+                className="w-4 h-4"
+                fill={activeTab === "authentication" ? "#C7FB20" : "#A1A1A9"}
               />
               Authentication
             </button>
@@ -116,9 +119,9 @@ export function Playground({ initialJWT }: PlaygroundProps) {
                   : {}
               }
             >
-              <CreditCardIcon 
-                className="w-4 h-4" 
-                fill={activeTab === "payment-methods" ? "#C7FB20" : "#A1A1A9"} 
+              <CreditCardIcon
+                className="w-4 h-4"
+                fill={activeTab === "payment-methods" ? "#C7FB20" : "#A1A1A9"}
               />
               Payment Methods
             </button>
@@ -135,9 +138,9 @@ export function Playground({ initialJWT }: PlaygroundProps) {
                   : {}
               }
             >
-              <ShoppingCartIcon 
-                className="w-4 h-4" 
-                fill={activeTab === "purchase-intents" ? "#C7FB20" : "#A1A1A9"} 
+              <ShoppingCartIcon
+                className="w-4 h-4"
+                fill={activeTab === "purchase-intents" ? "#C7FB20" : "#A1A1A9"}
               />
               Purchase Intents
             </button>
@@ -152,8 +155,8 @@ export function Playground({ initialJWT }: PlaygroundProps) {
         )}
 
         {activeTab === "payment-methods" && (
-          <PaymentMethodsTab 
-            publicJWT={publicJWT} 
+          <PaymentMethodsTab
+            publicJWT={publicJWT}
             privateJWT={privateJWT}
             onPurchaseIntentCreated={handlePurchaseIntentCreated}
             onError={handleError}

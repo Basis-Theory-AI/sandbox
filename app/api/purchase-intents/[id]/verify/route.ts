@@ -31,20 +31,8 @@ export async function POST(
       jwt = await generateJWT(defaultUserId, config, ['public'])
     }
 
-    console.log('🔐 Verifying purchase intent:', {
-      id,
-      action: body.action,
-      hasIframeData: !!body.iframeData,
-      hasPayload: !!body.payload
-    })
-
     // Call main API using service
     const responseData = await BtAiApiService.verifyPurchaseIntent(jwt, id, body)
-
-    console.log('✅ Purchase intent verification successful:', {
-      id,
-      status: responseData.status || 'unknown'
-    })
 
     return NextResponse.json(responseData)
 

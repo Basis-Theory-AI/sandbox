@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * GET /api/payment-methods - Route to list payment methods
+ * GET /api/payment-methods - Route to list payment methods with pagination
  * @param request - The request object
  * @returns - 200 OK
  */
@@ -83,10 +83,41 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // call main BT AI API
-    const responseData = await BtAiApiService.fetchPaymentMethods(jwt);
+    // extract pagination parameters from query string
+    const { searchParams } = new URL(request.url);
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const offset = parseInt(searchParams.get("offset") || "0");
 
-    return NextResponse.json(responseData);
+    // call main API using paginated service
+    const { data: responseData, response: apiResponse } =
+      await BtAiApiService.fetchPaymentMethodsPaginated(jwt, limit, offset);
+
+    // create response with data
+    const response = NextResponse.json(responseData);
+
+    // forward pagination headers from the main API to the frontend
+    response.headers.set(
+      "X-Total-Count",
+      apiResponse.headers.get("X-Total-Count") || "0"
+    );
+    response.headers.set(
+      "X-Limit",
+      apiResponse.headers.get("X-Limit") || limit.toString()
+    );
+    response.headers.set(
+      "X-Offset",
+      apiResponse.headers.get("X-Offset") || offset.toString()
+    );
+    response.headers.set(
+      "X-Has-Next",
+      apiResponse.headers.get("X-Has-Next") || "false"
+    );
+    response.headers.set(
+      "X-Has-Previous",
+      apiResponse.headers.get("X-Has-Previous") || "false"
+    );
+
+    return response;
   } catch (error) {
     console.error("Payment methods fetch failed:", error);
     return NextResponse.json(
