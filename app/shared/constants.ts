@@ -3,7 +3,7 @@ export const TEST_CARDS = {
     number: "4622943123121270",
   },
   mastercard: {
-    number: "5120350100064594",
+    number: "5186161910000103",
   },
   "american-express": {
     number: "370000000000002",
