@@ -48,7 +48,7 @@ function CardBadge({ brand, type }: { brand: string; type: string }) {
       }}
     >
       {typeof icon === "string" ? <span>{icon}</span> : icon}
-      <span>{type?.toUpperCase()} CARD</span>
+      <span>{type?.toUpperCase() ?? 'CREDIT'} CARD</span>
     </span>
   );
 }
