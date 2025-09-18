@@ -1,138 +1,128 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { generateJWT, getJWTConfig } from '../../../lib/jwt/jwtService'
+import { NextRequest, NextResponse } from "next/server";
+import { generateJWT, getJWTConfig } from "../../services/jwtService";
+import { BtAiApiService } from "../../services/btAiApiService";
 
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000'
-const PROJECT_ID = process.env.JWT_PROJECT_ID
-
-// POST - Create Payment Method (requires public role)
+/**
+ * POST /api/payment-methods - Route to create a payment method
+ * @param request
+ * @returns - 200 OK
+ */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { cardNumber, expirationMonth, expirationYear, cvc, cardBrand } = body
+    const body = await request.json();
+    const { cardNumber, expirationMonth, expirationYear, cvc } = body;
 
-    // Validate required fields
+    // validate required fields
     if (!cardNumber || !expirationMonth || !expirationYear || !cvc) {
       return NextResponse.json(
-        { error: 'Missing required fields: cardNumber, expirationMonth, expirationYear, cvc' },
+        {
+          error:
+            "Missing one or more required fields: cardNumber, expirationMonth, expirationYear, cvc",
+        },
         { status: 400 }
-      )
+      );
     }
 
-    // Get JWT from Authorization header or generate default with public role
-    const authHeader = request.headers.get('Authorization')
-    let jwt: string
-    const defaultUserId = process.env.NEXT_PUBLIC_DEFAULT_USER_ID || 'user123'
-    
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      jwt = authHeader.substring(7)
+    // get JWT from Authorization header
+    const authHeader = request.headers.get("Authorization");
+    const entityId = process.env.NEXT_PUBLIC_DEFAULT_USER_ID || "user123"; // TODO: get entityId from JWT or body
+
+    let jwt: string;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      jwt = authHeader.substring(7);
     } else {
-      // Fallback: generate JWT with public role for payment method creation
-      const config = getJWTConfig()
-      jwt = await generateJWT(defaultUserId, config, ['public'])
+      return NextResponse.json(
+        { error: "Missing Authorization header" },
+        { status: 401 }
+      );
     }
 
-    // Prepare payment method data
     const paymentMethodData = {
-      entityId: defaultUserId,
+      entityId,
       card: {
         number: cardNumber,
-        expirationMonth: expirationMonth.toString().padStart(2, '0'),
+        expirationMonth: expirationMonth.toString().padStart(2, "0"),
         expirationYear: expirationYear.toString(),
-        cvc: cvc
-      }
-    }
-
-    console.log('🚀 Creating payment method:', { 
-      cardBrand, 
-      last4: cardNumber.slice(-4),
-      expirationMonth: paymentMethodData.card.expirationMonth,
-      expirationYear: paymentMethodData.card.expirationYear
-    })
-
-    // Call main API
-    const response = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/payment-methods`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${jwt}`
+        cvc: cvc,
       },
-      body: JSON.stringify(paymentMethodData)
-    })
+    };
 
-    const responseData = await response.json()
+    // call main BT AI API
+    const responseData = await BtAiApiService.createPaymentMethod(
+      jwt,
+      paymentMethodData
+    );
 
-    if (!response.ok) {
-      console.error('❌ Payment method creation failed:', responseData)
-      return NextResponse.json(
-        { error: responseData.error || 'Failed to create payment method' },
-        { status: response.status }
-      )
-    }
-
-    console.log('✅ Payment method created successfully:', {
-      id: responseData.id,
-      brand: responseData.card?.brand,
-      last4: responseData.card?.details?.last4
-    })
-
-    return NextResponse.json(responseData)
-
+    return NextResponse.json(responseData);
   } catch (error) {
-    console.error('❌ Payment method creation error:', error)
+    console.error("Payment method creation failed:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
-    )
+    );
   }
 }
 
-// GET - List Payment Methods (requires private role)
+/**
+ * GET /api/payment-methods - Route to list payment methods with pagination
+ * @param request - The request object
+ * @returns - 200 OK
+ */
 export async function GET(request: NextRequest) {
   try {
     // Get JWT from Authorization header or generate default with private role
-    const authHeader = request.headers.get('Authorization')
-    let jwt: string
-    
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      jwt = authHeader.substring(7)
+    const authHeader = request.headers.get("Authorization");
+
+    let jwt: string;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      jwt = authHeader.substring(7);
     } else {
-      // Fallback: generate JWT with private role for fetching payment methods
-      const config = getJWTConfig()
-      const defaultUserId = process.env.NEXT_PUBLIC_DEFAULT_USER_ID || 'user123'
-      jwt = await generateJWT(defaultUserId, config, ['private'])
-    }
-
-    console.log('📋 Fetching payment methods for project:', PROJECT_ID)
-
-    // Call main API
-    const response = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/payment-methods`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${jwt}`
-      }
-    })
-
-    const responseData = await response.json()
-
-    if (!response.ok) {
-      console.error('❌ Failed to fetch payment methods:', responseData)
       return NextResponse.json(
-        { error: responseData.error || 'Failed to fetch payment methods' },
-        { status: response.status }
-      )
+        { error: "Missing Authorization header" },
+        { status: 401 }
+      );
     }
 
-    console.log('✅ Payment methods fetched successfully:', {
-      count: responseData.length || 0
-    })
+    // extract pagination parameters from query string
+    const { searchParams } = new URL(request.url);
+    const limit = parseInt(searchParams.get("limit") || "10");
+    const offset = parseInt(searchParams.get("offset") || "0");
 
-    return NextResponse.json(responseData)
+    // call main API using paginated service
+    const { data: responseData, response: apiResponse } =
+      await BtAiApiService.fetchPaymentMethodsPaginated(jwt, limit, offset);
 
+    // create response with data
+    const response = NextResponse.json(responseData);
+
+    // forward pagination headers from the main API to the frontend
+    response.headers.set(
+      "X-Total-Count",
+      apiResponse.headers.get("X-Total-Count") || "0"
+    );
+    response.headers.set(
+      "X-Limit",
+      apiResponse.headers.get("X-Limit") || limit.toString()
+    );
+    response.headers.set(
+      "X-Offset",
+      apiResponse.headers.get("X-Offset") || offset.toString()
+    );
+    response.headers.set(
+      "X-Has-Next",
+      apiResponse.headers.get("X-Has-Next") || "false"
+    );
+    response.headers.set(
+      "X-Has-Previous",
+      apiResponse.headers.get("X-Has-Previous") || "false"
+    );
+
+    return response;
   } catch (error) {
-    console.error('❌ Payment methods fetch error:', error)
+    console.error("Payment methods fetch failed:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
-    )
+    );
   }
-} 
+}

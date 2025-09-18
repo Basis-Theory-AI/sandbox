@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateJWT, getJWTConfig } from '../../../../../lib/jwt/jwtService'
-
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3000'
-const PROJECT_ID = process.env.JWT_PROJECT_ID
+import { generateJWT, getJWTConfig } from '../../../services/jwtService'
+import { BtAiApiService } from '../../../services/btAiApiService'
 
 // GET - Fetch Purchase Intent Details with Card Info
 export async function GET(
@@ -32,31 +30,8 @@ export async function GET(
       jwt = await generateJWT(defaultUserId, config, ['private'])
     }
 
-    console.log('🔍 Fetching purchase intent details for:', id)
-
-    // Call main API
-    const response = await fetch(`${API_BASE_URL}/projects/${PROJECT_ID}/purchase-intents/${id}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${jwt}`
-      }
-    })
-
-    const responseData = await response.json()
-
-    if (!response.ok) {
-      console.error('❌ Failed to fetch purchase intent details:', responseData)
-      return NextResponse.json(
-        { error: responseData.error || 'Failed to fetch purchase intent details' },
-        { status: response.status }
-      )
-    }
-
-    console.log('✅ Purchase intent details fetched successfully:', {
-      id: responseData.id,
-      status: responseData.status,
-      hasCard: !!responseData.card
-    })
+    // Call main API using service
+    const responseData = await BtAiApiService.fetchPurchaseIntentDetails(jwt, id)
 
     return NextResponse.json(responseData)
 
