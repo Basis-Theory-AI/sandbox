@@ -1,26 +1,24 @@
-# Basis Theory React Integration Example
+# BT AI Playground
 
-A comprehensive Next.js example application demonstrating secure payment processing with Basis Theory's React SDK, featuring JWT authentication, payment method management, and purchase intent verification.
+A comprehensive Next.js playground application demonstrating the BT AI React SDK, featuring JWT authentication, payment method management, and purchase intent verification with real-time verification flows.
 
 ## 🎯 What This App Demonstrates
 
-This example shows how to build a production-ready payment application using Basis Theory with:
+This playground shows how to integrate the Basis Theory AI React SDK in a real-world application with:
 
 - **🔐 Secure JWT Authentication** - Server-side JWT generation with RS256 signatures
-- **💳 Payment Method Management** - Create and manage tokenized payment methods
-- **🛒 Purchase Intent Processing** - Create and verify purchase intents with real-time status
-- **⚡ Real-time Updates** - Live JWT status monitoring with automatic token refresh
-- **🛡️ Security Best Practices** - Private keys stay server-side, sensitive data never exposed
-- **🎨 Modern UI** - Clean, responsive interface built with Tailwind CSS
+- **💳 Payment Method Management** - Create and manage tokenized payment methods via BT AI API
+- **🛒 Purchase Intent Processing** - Create and verify purchase intents with Visa and Mastercard networks
+- **⚡ Real-time Verification** - Live purchase intent verification with network-specific flows
 
 ## 📸 Features Overview
 
-### Dashboard Features
-- **JWT Status Monitor** - Real-time JWT status with expiration countdown
-- **Payment Method Creator** - Add new payment methods with card tokenization
-- **Payment Method List** - View and manage existing payment methods
-- **Purchase Intent Manager** - Create and track purchase intents
-- **Verification Modal** - Real-time purchase intent verification with status updates
+### Playground Features
+- **Authentication Tab** - JWT status monitor with real-time expiration countdown and token display
+- **Payment Methods Tab** - Create and manage tokenized payment methods with card details modal
+- **Purchase Intents Tab** - Create, track, and verify purchase intents
+- **Verification Modal** - Real-time purchase intent verification with Visa and Mastercard flows
+- **Status Tracking** - Live updates for verification processes with detailed progress indicators
 
 ### Technical Features  
 - **Automatic Token Refresh** - JWTs refresh automatically 5 minutes before expiration
@@ -40,13 +38,13 @@ This example shows how to build a production-ready payment application using Bas
 
 ```bash
 git clone <your-repo-url>
-cd basis-theory-react-example
+cd basistheory-ai/react/example
 yarn install
 ```
 
 ### 2. Environment Setup
 
-Create a `.env.local` file in the root directory with your Basis Theory project details:
+Create a `.env` file in the example directory with your Basis Theory project details:
 
 ```bash
 # Basis Theory Project Configuration
@@ -60,10 +58,10 @@ YOUR_PRIVATE_KEY_HERE
 
 # Application Configuration
 NEXT_PUBLIC_PROJECT_ID=your-basis-theory-project-id
-NEXT_PUBLIC_DEFAULT_USER_ID=example-user-123
-NEXT_PUBLIC_DEFAULT_ROLES=private
+NEXT_PUBLIC_DEFAULT_USER_ID=user123
+NEXT_PUBLIC_DEFAULT_ROLES=public
 
-# API Base URL (for payment method and purchase intent APIs)
+# API Base URL (for BT AI API integration)
 API_BASE_URL=http://localhost:3000
 ```
 
@@ -94,46 +92,67 @@ This will generate a public HTTPS URL (e.g., `https://xyz.trycloudflare.com`) th
 
 ## 🏗️ Architecture Overview
 
-### Backend (API Routes)
+### Backend (API Routes - Next.js App Router)
 
 ```
-/api/auth/jwt          - JWT generation and refresh
-/api/payment-methods   - Payment method CRUD operations  
-/api/purchase-intents  - Purchase intent management
+/api/auth/generate-jwt         - JWT generation with RS256 signatures
+/api/payment-methods           - Payment method creation and listing via BT AI API
+/api/purchase-intents          - Purchase intent management
+/api/purchase-intents/[id]     - Individual intent operations
+/api/purchase-intents/[id]/verify - Purchase intent verification
+/api/event/publish             - Event publishing for verification flows
 ```
 
-### Frontend Components
+### Frontend Components (Next.js App Router)
 
 ```
-src/
+app/
 ├── components/
-│   ├── JWTStatus.tsx           - Real-time JWT monitoring
-│   ├── PaymentMethodCreator.tsx - Payment method creation form
-│   ├── PaymentMethodList.tsx    - Payment method management
-│   ├── PurchaseIntentList.tsx   - Purchase intent tracking
-│   ├── VerificationModal.tsx    - Purchase intent verification
-│   └── CardDetailsModal.tsx     - Card details display
+│   ├── authentication/
+│   │   ├── AuthenticationTab.tsx      - JWT status and management
+│   │   └── JWTDisplayCard.tsx         - JWT token display
+│   ├── payment-methods/
+│   │   ├── PaymentMethodsTab.tsx      - Payment methods container
+│   │   ├── PaymentMethodList.tsx      - Payment method list
+│   │   └── PaymentMethodCreateModal.tsx - Payment method creation
+│   ├── purchase-intents/
+│   │   ├── PurchaseIntentsTab.tsx     - Purchase intents container
+│   │   ├── PurchaseIntentList.tsx     - Purchase intent list
+│   │   ├── CreatePurchaseIntentModal.tsx - Intent creation
+│   │   └── PurchaseIntentCredentialModal.tsx - Network credentials
+│   ├── shared/
+│   │   ├── JSONDisplay.tsx            - JSON data display
+│   │   ├── Snackbar.tsx              - Toast notifications
+│   │   └── icons/                     - SVG icon components
+│   └── Playground.tsx                 - Main playground container
 ├── hooks/
-│   └── useJWT.ts               - JWT state management
-└── App.jsx                     - Main application
+│   ├── usePaymentMethods.ts          - Payment method state
+│   ├── usePurchaseIntents.ts         - Purchase intent state
+│   └── useSnackbar.ts                - Notification state
+├── services/
+│   ├── apiService.ts                 - JWT and auth API calls
+│   ├── btAiApiService.ts             - BT AI API integration
+│   └── jwtService.ts                 - JWT utilities
+└── page.tsx                          - Main app entry point
 ```
 
 ## 🔄 How It Works
 
 ### JWT Authentication Flow
 
-1. **Frontend Requests JWT** → `useJWT` hook calls `/api/auth/jwt`
-2. **Backend Generates JWT** → Server creates RS256-signed JWT with user claims
-3. **Frontend Receives Token** → JWT stored in state with expiration tracking
-4. **Basis Theory Integration** → JWT passed as API key to `BasisTheoryProvider`
-5. **Automatic Refresh** → Token refreshes 5 minutes before expiration
+1. **App Initialization** → `page.tsx` generates initial public JWT via `APIService.generateJWT()`
+2. **BT AI Provider Setup** → JWT passed to `BtAiProvider` which initializes the SDK
+3. **SDK Initialization** → Visa and Mastercard SDKs initialize with network credentials
+4. **Authentication Tab** → Real-time JWT status
+5. **Role Management** → JWTs can be regenerated with different roles (public/private) and entityId
 
 ### Payment Processing Flow
 
-1. **Tokenize Card Data** → Sensitive card data tokenized with Basis Theory
-2. **Create Payment Method** → Token referenced to create payment method
-3. **Create Purchase Intent** → Link payment method to purchase intent
-4. **Verify Transaction** → Real-time verification with status updates
+1. **JWT Generation** → Server-side JWT creation with configurable user/role claims
+2. **Payment Method Creation** → Uses BT AI API to create tokenized payment methods
+3. **Purchase Intent Creation** → Links payment method to purchase intent via BT AI API
+4. **Verification Flow** → Real-time verification using BT AI React SDK with network-specific flows
+5. **Network Verification** → Visa and Mastercard verification with credential management
 
 ## 🛠️ Development
 
@@ -148,11 +167,12 @@ yarn lint     # Run ESLint
 
 ### Key Technologies
 
+- **@basis-theory-ai/react** - BT AI React SDK for payment verification
 - **Next.js 13+** - React framework with App Router
 - **TypeScript** - Type safety and better DX
 - **Tailwind CSS** - Utility-first CSS framework  
-- **Jose** - JWT creation and verification
-- **Basis Theory React SDK** - Payment tokenization and processing
+- **Jose** - JWT creation and verification (RS256 signatures)
+- **React Hooks** - State management for payment methods and purchase intents
 
 ## 🔒 Security Features
 
@@ -176,26 +196,30 @@ yarn lint     # Run ESLint
 JWT_PROJECT_ID=your-basis-theory-project-id
 JWT_KEY_ID=your-jwt-key-id
 JWT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----..."
+NEXT_PUBLIC_PROJECT_ID=your-basis-theory-project-id
 NEXT_PUBLIC_DEFAULT_USER_ID=production-user
-NEXT_PUBLIC_DEFAULT_ROLES=private
-API_BASE_URL=https://your-api-domain.com
+NEXT_PUBLIC_DEFAULT_ROLES=public
+API_BASE_URL=https://api.sandbox.basistheory.ai
 ```
 
 ## 🧪 Testing
 
-### Test the JWT Flow
+### Test the Authentication Flow
 
-1. **Load the app** - JWT should generate automatically
-2. **Check JWT Status** - Green status indicates successful authentication
-3. **Copy JWT Token** - Use the copy button to inspect the token
-4. **Wait for Refresh** - Token should refresh before expiration
+1. **Load the app** - Initial public JWT generates automatically on app start
+2. **Authentication Tab** - Check JWT status with real-time countdown
+3. **Generate New JWT** - Test different user IDs and roles (public/private)
+4. **Copy JWT Token** - Use the copy button to inspect the token in JWT debuggers
 
 ### Test Payment Features
 
-1. **Create Payment Method** - Add a test card (use Basis Theory test cards)
-2. **View Payment Methods** - Check the payment method list updates
-3. **Create Purchase Intent** - Link a payment method to a purchase
-4. **Verify Purchase** - Test the verification flow with real-time updates
+1. **Payment Methods Tab** - Navigate to payment method management
+2. **Create Payment Method** - Add test cards using the creation modal
+3. **View Card Details** - Click on payment methods to see tokenized card data
+4. **Purchase Intents Tab** - Navigate to purchase intent management
+5. **Create Purchase Intent** - Link payment methods to new purchase intents
+6. **View Network Credentials** - Check Visa/Mastercard credentials for each intent
+7. **Verify Purchase Intent** - Test real-time verification with network-specific flows
 
 **For Visa Verification Testing:**
 - Ensure you're accessing the app via the HTTPS tunnel URL (not localhost)
@@ -212,14 +236,22 @@ API_BASE_URL=https://your-api-domain.com
 - Ensure the public key is added to your Basis Theory project
 
 **Payment Methods Not Creating**
-- Confirm your Basis Theory project has the correct permissions
-- Verify the API_BASE_URL points to your payment API
-- Check that your JWT has the necessary roles (`private`)
+- Confirm your BT AI API integration is properly configured
+- Verify the API_BASE_URL points to the correct BT AI endpoint
+- Check that your JWT has the necessary roles for payment method creation
+- Ensure your Basis Theory project has payment method permissions
+
+**Purchase Intents Issues**
+- Verify your payment method exists before creating purchase intents
+- Check that network credentials (Visa/Mastercard) are properly configured
+- Ensure your purchase intent is in the correct status for verification
+- Confirm your JWT has the necessary permissions for intent operations
 
 **Verification Fails**
-- Ensure your purchase intent is in the correct status
-- Confirm your payment method is properly linked
-- Verify your JWT hasn't expired
+- Ensure your purchase intent is in a verifiable status
+- Confirm your payment method is properly linked to the intent
+- Verify your JWT hasn't expired and has sufficient permissions
+- Check that network SDKs (Visa/Mastercard) are properly initialized
 - **For Visa verification:** Make sure you're using the HTTPS tunnel URL, not localhost
 
 **Cloudflare Tunnel Issues**
@@ -240,4 +272,4 @@ This example is open source and available under the [MIT License](LICENSE).
 
 ---
 
-Built with ❤️ using [Basis Theory](https://basistheory.com) and [Next.js](https://nextjs.org)
+Built with ❤️ using [Basis Theory AI](https://basistheory.com) and [Next.js](https://nextjs.org)
