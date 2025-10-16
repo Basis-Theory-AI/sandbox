@@ -95,7 +95,7 @@ export function SnackbarContainer() {
   if (snackbars.length === 0) return null;
 
   return (
-    <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 flex flex-col gap-2 max-w-2xl">
+    <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 flex flex-col gap-2 max-w-2xl" style={{ zIndex: 100 }}>
       {snackbars.map((snackbar) => (
         <SingleSnackbar
           key={snackbar.id}

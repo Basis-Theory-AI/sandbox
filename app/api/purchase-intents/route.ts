@@ -55,7 +55,7 @@ const DEFAULT_MANDATES = [
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { paymentMethodId, entityId } = body;
+    const { paymentMethodId, entityId, mandates } = body;
 
     // Validate required fields
     if (!paymentMethodId) {
@@ -97,12 +97,12 @@ export async function POST(request: NextRequest) {
         ? "network-token"
         : "virtual-card";
 
-    // Prepare purchase intent data with default mandates
+    // Prepare purchase intent data - use provided mandates or fall back to defaults
     const purchaseIntentData = {
       entityId: defaultUserId,
       paymentMethodId: paymentMethodId,
       credentialType,
-      mandates: DEFAULT_MANDATES,
+      mandates: mandates || DEFAULT_MANDATES,
     };
 
     // call main API using service
