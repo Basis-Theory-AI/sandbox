@@ -272,4 +272,4 @@ This example is open source and available under the [MIT License](LICENSE).
 
 ---
 
-Built with ❤️ using [Basis Theory AI](https://basistheory.com) and [Next.js](https://nextjs.org)
+Built with ❤️ using [Basis Theory AI](https://basistheory.com) and [Next.js](https://nextjs.org) 

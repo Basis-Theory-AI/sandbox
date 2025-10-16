@@ -38,7 +38,7 @@ function Home() {
   }
 
   return (
-    <BtAiProvider jwt={initialJWT} environment="sandbox">
+    <BtAiProvider jwt={initialJWT} environment="production">
       <Playground initialJWT={initialJWT} />
     </BtAiProvider>
   );
